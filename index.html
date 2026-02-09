@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Origen Puro Coffee - Café de Especialidad</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <!-- Se actualizará dinámicamente con JavaScript -->
+                </div>
+                <nav class="nav">
+                    <a href="index.html">Inicio</a>
+                    <a href="mis-compras.html">Mis Compras</a>
+                    <a href="carrito.html" class="cart-link">
+                        🛒 Carrito (<span id="cart-count">0</span>)
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <!-- Elementos decorativos flotantes -->
+        <div class="hero-floating" style="font-size: 3rem;">☕</div>
+        <div class="hero-floating" style="font-size: 2.5rem;">🌱</div>
+        <div class="hero-floating" style="font-size: 2rem;">⭐</div>
+        
+        <div class="container">
+            <div class="hero-content">
+                <h2>Descubre cafés excepcionales</h2>
+                <p>Granos selectos de las mejores regiones del mundo, tostados artesanalmente para una experiencia única</p>
+                <div class="hero-badge">
+                    Calidad Premium Garantizada
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRODUCTOS DESTACADOS -->
+    <section class="productos-section">
+        <div class="container">
+            <h2 class="section-title">Nuestros Cafés</h2>
+            
+            <!-- Productos TOP -->
+            <div id="productos-top" class="productos-grid">
+                <!-- Se llenan dinámicamente con JavaScript -->
+            </div>
+
+            <h3 class="section-subtitle">Todos los productos</h3>
+            
+            <!-- Todos los productos -->
+            <div id="productos-todos" class="productos-grid">
+                <!-- Se llenan dinámicamente con JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- El footer se genera dinámicamente con JavaScript -->
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/footer.js"></script>
+    <script>
+        // Cargar productos al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar configuración del sitio
+            initializeSiteElements();
+            
+            // Cargar productos (estas funciones deben estar en main.js)
+            if (typeof cargarProductosTop === 'function') {
+                cargarProductosTop();
+            }
+            if (typeof cargarTodosProductos === 'function') {
+                cargarTodosProductos();
+            }
+            
+            // Actualizar contador del carrito después de que esté disponible
+            if (typeof carrito !== 'undefined') {
+                carrito.actualizarContador();
+                updateCartCounter();
+            }
+        });
+    </script>
+</body>
+</html>

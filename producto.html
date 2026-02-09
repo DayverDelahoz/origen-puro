@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Producto - Origen Puro Coffee</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <!-- Se actualizará dinámicamente con JavaScript -->
+                </div>
+                <nav class="nav">
+                    <a href="index.html">Inicio</a>
+                    <a href="mis-compras.html">Mis Compras</a>
+                    <a href="carrito.html" class="cart-link">
+                        🛒 Carrito (<span id="cart-count">0</span>)
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- DETALLE DEL PRODUCTO -->
+    <section class="producto-detalle">
+        <div class="container">
+            <div class="producto-layout">
+                <!-- Imagen del producto -->
+                <div class="producto-imagen">
+                    <img id="producto-img" src="" alt="Producto">
+                    <img id="producto-img-secondary" src="" alt="Producto vista 2" style="margin-top: 1rem; display: none;">
+                </div>
+
+                <!-- Información del producto -->
+                <div class="producto-info">
+                    <h1 id="producto-nombre">Cargando...</h1>
+                    <p class="producto-origen" id="producto-origen"></p>
+                    
+                    <div class="producto-precio-container">
+                        <span class="producto-precio-original" id="precio-original"></span>
+                        <span class="producto-precio" id="producto-precio">€0.00</span>
+                        <span class="producto-descuento" id="producto-descuento"></span>
+                    </div>
+
+                    <div class="producto-descripcion">
+                        <h3>Descripción</h3>
+                        <p id="producto-descripcion">Cargando descripción...</p>
+                    </div>
+
+                    <!-- Selector de cantidad -->
+                    <div class="cantidad-selector">
+                        <label for="cantidad">Cantidad:</label>
+                        <div class="cantidad-controls">
+                            <button id="btn-decrementar" class="btn-cantidad">-</button>
+                            <input type="number" id="cantidad" value="1" min="1" max="10" readonly>
+                            <button id="btn-incrementar" class="btn-cantidad">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="producto-acciones">
+                        <button id="btn-agregar-carrito" class="btn btn-primary">
+                            Añadir al carrito
+                        </button>
+                        <button id="btn-comprar-ahora" class="btn btn-success">
+                            Comprar ahora
+                        </button>
+                        <a href="index.html" class="btn btn-secondary">
+                            Volver a la tienda
+                        </a>
+                    </div>
+
+                    <!-- Mensaje de confirmación -->
+                    <div id="mensaje-agregado" class="mensaje-exito" style="display: none;">
+                        ✓ Producto añadido al carrito
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/footer.js"></script>
+    <script>
+        // Inicializar elementos del sitio
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeSiteElements();
+            
+            // Obtener ID del producto de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const productoId = urlParams.get('id');
+
+            if (productoId) {
+                cargarProducto(productoId);
+            } else {
+                window.location.href = 'index.html';
+            }
+
+            // Actualizar contador del carrito
+            if (typeof carrito !== 'undefined') {
+                carrito.actualizarContador();
+                updateCartCounter();
+            }
+
+            // Controles de cantidad
+            document.getElementById('btn-incrementar').addEventListener('click', () => {
+                const input = document.getElementById('cantidad');
+                if (input.value < 10) {
+                    input.value = parseInt(input.value) + 1;
+                }
+            });
+
+            document.getElementById('btn-decrementar').addEventListener('click', () => {
+                const input = document.getElementById('cantidad');
+                if (input.value > 1) {
+                    input.value = parseInt(input.value) - 1;
+                }
+            });
+
+            // Agregar al carrito
+            document.getElementById('btn-agregar-carrito').addEventListener('click', () => {
+                agregarAlCarrito();
+            });
+            
+            // Comprar ahora (agregar y ir directo al checkout)
+            document.getElementById('btn-comprar-ahora').addEventListener('click', () => {
+                const cantidad = parseInt(document.getElementById('cantidad').value);
+                
+                if (window.productoActual) {
+                    // Agregar al carrito
+                    carrito.agregar(window.productoActual, cantidad);
+                    
+                    // Redirigir inmediatamente al checkout
+                    window.location.href = 'checkout.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
