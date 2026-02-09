@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Compras - Origen Puro Coffee</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <!-- Se actualizará dinámicamente con JavaScript -->
+                </div>
+                <nav class="nav">
+                    <a href="index.html">Inicio</a>
+                    <a href="mis-compras.html">Mis Compras</a>
+                    <a href="carrito.html" class="cart-link">
+                        🛒 Carrito (<span id="cart-count">0</span>)
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- MIS COMPRAS -->
+    <section class="pedidos-section">
+        <div class="container">
+            <h1 class="page-title">Mis Compras</h1>
+
+            <!-- Sin pedidos -->
+            <div id="sin-pedidos" class="carrito-vacio" style="display: none;">
+                <p>No has realizado ninguna compra aún</p>
+                <a href="index.html" class="btn btn-primary">Ir a la tienda</a>
+            </div>
+
+            <!-- Lista de pedidos -->
+            <div id="lista-pedidos" class="pedidos-lista">
+                <!-- Se llena dinámicamente con JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/footer.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar elementos del sitio (incluye el logo)
+            initializeSiteElements();
+            
+            // Funcionalidad específica de mis compras
+            mostrarPedidos();
+            if (typeof carrito !== 'undefined') {
+                carrito.actualizarContador();
+                updateCartCounter();
+            }
+        });
+    </script>
+</body>
+</html>
