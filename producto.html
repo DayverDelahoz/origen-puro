@@ -4,28 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Producto - Origen Puro Coffee</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <meta name="description" content="Descubre los detalles de nuestros cafés de especialidad premium">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- CSS Elegante -->
+    <link rel="stylesheet" href="css/styles-elegant.css">
 </head>
 <body>
-    <!-- HEADER -->
+    <!-- HEADER FIJO ELEGANTE -->
     <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <!-- Se actualizará dinámicamente con JavaScript -->
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-content">
+                    <h1>OPC</h1>
+                    <div class="tagline">ORIGEN PURO CAFÉ</div>
                 </div>
-                <nav class="nav">
-                    <a href="index.html">Inicio</a>
-                    <a href="mis-compras.html">Mis Compras</a>
-                    <a href="carrito.html" class="cart-link">
-                        🛒 Carrito (<span id="cart-count">0</span>)
-                    </a>
-                </nav>
             </div>
+            <nav class="nav">
+                <a href="index.html">Inicio</a>
+                <a href="mis-compras.html">Mis Compras</a>
+                <a href="carrito.html" class="cart-link">
+                    🛒 Carrito (<span id="cart-count">0</span>)
+                </a>
+            </nav>
         </div>
     </header>
 
-    <!-- DETALLE DEL PRODUCTO -->
+    <!-- DETALLE DEL PRODUCTO ELEGANTE -->
     <section class="producto-detalle">
         <div class="container">
             <div class="producto-layout">
@@ -41,9 +49,9 @@
                     <p class="producto-origen" id="producto-origen"></p>
                     
                     <div class="producto-precio-container">
-                        <span class="producto-precio-original" id="precio-original"></span>
+                        <span class="producto-precio-original" id="precio-original" style="display: none;"></span>
                         <span class="producto-precio" id="producto-precio">€0.00</span>
-                        <span class="producto-descuento" id="producto-descuento"></span>
+                        <span class="producto-descuento" id="producto-descuento" style="display: none;"></span>
                     </div>
 
                     <div class="producto-descripcion">
@@ -51,30 +59,37 @@
                         <p id="producto-descripcion">Cargando descripción...</p>
                     </div>
 
-                    <!-- Selector de cantidad -->
+                    <!-- Características adicionales -->
+                    <div class="producto-caracteristicas">
+                        <div class="caracteristica">
+                            <strong>Nivel de tueste:</strong> <span id="nivel-tueste">Medio</span>
+                        </div>
+                        <div class="caracteristica">
+                            <strong>Peso:</strong> <span id="peso-producto">250g</span>
+                        </div>
+                    </div>
+
+                    <!-- Selector de cantidad elegante -->
                     <div class="cantidad-selector">
                         <label for="cantidad">Cantidad:</label>
                         <div class="cantidad-controls">
-                            <button id="btn-decrementar" class="btn-cantidad">-</button>
+                            <button id="btn-decrementar" class="btn-cantidad">−</button>
                             <input type="number" id="cantidad" value="1" min="1" max="10" readonly>
                             <button id="btn-incrementar" class="btn-cantidad">+</button>
                         </div>
                     </div>
 
-                    <!-- Botones de acción -->
+                    <!-- Botones de acción elegantes -->
                     <div class="producto-acciones">
                         <button id="btn-agregar-carrito" class="btn btn-primary">
-                            Añadir al carrito
-                        </button>
-                        <button id="btn-comprar-ahora" class="btn btn-success">
-                            Comprar ahora
+                            🛒 Añadir al carrito
                         </button>
                         <a href="index.html" class="btn btn-secondary">
-                            Volver a la tienda
+                            ← Volver a la tienda
                         </a>
                     </div>
 
-                    <!-- Mensaje de confirmación -->
+                    <!-- Mensaje de confirmación elegante -->
                     <div id="mensaje-agregado" class="mensaje-exito" style="display: none;">
                         ✓ Producto añadido al carrito
                     </div>
@@ -83,13 +98,17 @@
         </div>
     </section>
 
+    <!-- El footer se genera dinámicamente con JavaScript -->
+
     <!-- Scripts -->
     <script src="js/config.js"></script>
     <script src="js/main.js"></script>
     <script src="js/footer.js"></script>
+    <script src="js/elegant-interactions.js"></script>
     <script>
         // Inicializar elementos del sitio
         document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar elementos del sitio
             initializeSiteElements();
             
             // Obtener ID del producto de la URL
@@ -108,11 +127,14 @@
                 updateCartCounter();
             }
 
-            // Controles de cantidad
+            // Controles de cantidad elegantes
             document.getElementById('btn-incrementar').addEventListener('click', () => {
                 const input = document.getElementById('cantidad');
                 if (input.value < 10) {
                     input.value = parseInt(input.value) + 1;
+                    // Efecto visual
+                    input.style.transform = 'scale(1.1)';
+                    setTimeout(() => input.style.transform = 'scale(1)', 200);
                 }
             });
 
@@ -120,15 +142,18 @@
                 const input = document.getElementById('cantidad');
                 if (input.value > 1) {
                     input.value = parseInt(input.value) - 1;
+                    // Efecto visual
+                    input.style.transform = 'scale(1.1)';
+                    setTimeout(() => input.style.transform = 'scale(1)', 200);
                 }
             });
 
-            // Agregar al carrito
+            // Agregar al carrito con efecto
             document.getElementById('btn-agregar-carrito').addEventListener('click', () => {
-                agregarAlCarrito();
+                agregarAlCarritoConEfecto();
             });
             
-            // Comprar ahora (agregar y ir directo al checkout)
+            // Comprar ahora
             document.getElementById('btn-comprar-ahora').addEventListener('click', () => {
                 const cantidad = parseInt(document.getElementById('cantidad').value);
                 
@@ -136,11 +161,136 @@
                     // Agregar al carrito
                     carrito.agregar(window.productoActual, cantidad);
                     
-                    // Redirigir inmediatamente al checkout
-                    window.location.href = 'checkout.html';
+                    // Efecto visual
+                    const btn = document.getElementById('btn-comprar-ahora');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '⚡ Redirigiendo...';
+                    btn.style.background = 'linear-gradient(135deg, #6B8E3D 0%, #5A7A2E 100%)';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'checkout.html';
+                    }, 500);
                 }
             });
+            
+            console.log('🎨 Página de producto con diseño elegante cargada');
         });
+
+        // Función mejorada para agregar al carrito
+        function agregarAlCarritoConEfecto() {
+            const cantidad = parseInt(document.getElementById('cantidad').value);
+            const btn = document.getElementById('btn-agregar-carrito');
+            const mensaje = document.getElementById('mensaje-agregado');
+            
+            if (window.productoActual) {
+                // Efecto en el botón
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '⏳ Agregando...';
+                btn.disabled = true;
+                
+                // Agregar al carrito
+                carrito.agregar(window.productoActual, cantidad);
+                
+                setTimeout(() => {
+                    btn.innerHTML = '✅ ¡Agregado!';
+                    btn.style.background = 'linear-gradient(135deg, #6B8E3D 0%, #5A7A2E 100%)';
+                    
+                    // Mostrar mensaje
+                    mensaje.style.display = 'block';
+                    mensaje.style.opacity = '0';
+                    mensaje.style.transform = 'translateY(10px)';
+                    
+                    // Animación del mensaje
+                    setTimeout(() => {
+                        mensaje.style.transition = 'all 0.3s ease';
+                        mensaje.style.opacity = '1';
+                        mensaje.style.transform = 'translateY(0)';
+                    }, 50);
+                    
+                    // Resetear botón
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.style.background = '';
+                        btn.disabled = false;
+                        
+                        // Ocultar mensaje
+                        mensaje.style.opacity = '0';
+                        mensaje.style.transform = 'translateY(-10px)';
+                        setTimeout(() => {
+                            mensaje.style.display = 'none';
+                        }, 300);
+                    }, 2000);
+                }, 500);
+                
+                // Resetear cantidad
+                document.getElementById('cantidad').value = 1;
+            }
+        }
     </script>
+
+    <style>
+        /* Estilos adicionales para características */
+        .producto-caracteristicas {
+            margin: var(--spacing-lg) 0;
+            padding: var(--spacing-md);
+            background: linear-gradient(135deg, rgba(139, 90, 60, 0.05) 0%, rgba(212, 165, 116, 0.05) 100%);
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(139, 90, 60, 0.1);
+        }
+
+        .caracteristica {
+            margin-bottom: var(--spacing-xs);
+            font-size: 0.95rem;
+        }
+
+        .caracteristica strong {
+            color: var(--color-primary);
+        }
+
+        .caracteristica span {
+            color: var(--color-text-light);
+        }
+
+        /* Efecto hover en imágenes */
+        .producto-imagen {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius-lg);
+        }
+
+        .producto-imagen::after {
+            content: '🔍 Click para ampliar';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-md);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .producto-imagen:hover::after {
+            opacity: 1;
+        }
+
+        /* Animaciones suaves */
+        .producto-acciones .btn {
+            transition: all 0.3s ease;
+        }
+
+        .mensaje-exito {
+            transition: all 0.3s ease;
+        }
+
+        #cantidad {
+            transition: transform 0.2s ease;
+        }
+    </style>
 </body>
 </html>

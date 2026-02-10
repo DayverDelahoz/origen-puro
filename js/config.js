@@ -1,19 +1,19 @@
 // ========================================
-// CONFIGURACIÓN DEL SITIO
+// CONFIGURACIÓN DEL SITIO - DISEÑO ELEGANTE
 // ========================================
 
 const siteConfig = {
     // Información del sitio
     siteName: "Origen Puro Coffee",
-    tagline: "Café de especialidad seleccionado",
+    tagline: "Café de especialidad premium",
     description: "Descubre cafés excepcionales de las mejores regiones del mundo",
     
     // Logo configuración
     logo: {
         main: "img/logo.png",
         alt: "Origen Puro Coffee",
-        headerWidth: "200px",
-        footerWidth: "150px"
+        headerWidth: "150px",
+        footerWidth: "100px"
     },
     
     // Información del estudiante
@@ -68,19 +68,22 @@ const siteConfig = {
 
 // Función para inicializar elementos dinámicos del sitio
 function initializeSiteElements() {
-    // Actualizar logo del sitio (solo imagen, sin texto)
+    // Actualizar logo del sitio con diseño elegante
     const logoElement = document.querySelector('.logo');
-    if (logoElement) {
+    if (logoElement && !logoElement.querySelector('img')) {
+        // Si no tiene imagen, agregarla
         logoElement.innerHTML = `
             <img src="${siteConfig.logo.main}" 
                  alt="${siteConfig.logo.alt}" 
-                 class="header-logo-only" 
-                 style="max-width: ${siteConfig.logo.headerWidth}; height: auto;">
+                 class="header-logo-image">
         `;
     }
     
     // Actualizar contador del carrito siempre
     updateCartCounter();
+    
+    // Log para confirmar inicialización
+    console.log('🎨 Elementos del sitio inicializados con diseño elegante');
 }
 
 // Función para actualizar contador del carrito
@@ -111,6 +114,25 @@ function updateCartCounter() {
             cartLink.textContent = '0';
         }
     }
+}
+
+// Función para obtener cantidad total del carrito
+function obtenerCantidadTotal() {
+    if (typeof carrito !== 'undefined' && carrito.obtenerCantidadTotal) {
+        return carrito.obtenerCantidadTotal();
+    }
+    
+    try {
+        const carritoLS = localStorage.getItem('carrito');
+        if (carritoLS) {
+            const items = JSON.parse(carritoLS);
+            return items.reduce((total, item) => total + (item.cantidad || 1), 0);
+        }
+    } catch (error) {
+        console.error('Error obteniendo cantidad total:', error);
+    }
+    
+    return 0;
 }
 
 // Exportar configuración para uso global

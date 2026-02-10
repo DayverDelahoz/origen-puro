@@ -4,24 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - Origen Puro Coffee</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <meta name="description" content="Finaliza tu compra de manera segura">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- CSS Elegante -->
+    <link rel="stylesheet" href="css/styles-elegant.css">
+    
+    <!-- PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=EUR&buyer-country=ES&merchant-id=sb-t43ei30968722@business.example.com&enable-funding=venmo&disable-funding=card"></script>
 </head>
 <body>
-    <!-- HEADER -->
+    <!-- HEADER FIJO ELEGANTE -->
     <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <!-- Se actualizará dinámicamente con JavaScript -->
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-content">
+                    <h1>OPC</h1>
+                    <div class="tagline">ORIGEN PURO CAFÉ</div>
                 </div>
-                <nav class="nav">
-                    <a href="index.html">Inicio</a>
-                    <a href="mis-compras.html">Mis Compras</a>
-                    <a href="carrito.html" class="cart-link">
-                        🛒 Carrito (<span id="cart-count">0</span>)
-                    </a>
-                </nav>
             </div>
+            <nav class="nav">
+                <a href="index.html">Inicio</a>
+                <a href="mis-compras.html">Mis Compras</a>
+                <a href="carrito.html" class="cart-link">
+                    🛒 Carrito (<span id="cart-count">0</span>)
+                </a>
+            </nav>
         </div>
     </header>
 
@@ -33,81 +44,91 @@
             <div class="checkout-layout">
                 <!-- Formulario de datos -->
                 <div class="checkout-form">
-                    <h2>Datos de envío</h2>
+                    <h2>📦 Datos de envío</h2>
                     
                     <form id="form-checkout">
                         <div class="form-group">
                             <label for="nombre">Nombre completo *</label>
-                            <input type="text" id="nombre" name="nombre" required>
+                            <input type="text" id="nombre" name="nombre" value="Miguel Pérez" required>
                         </div>
 
                         <div class="form-group">
                             <label for="email">Email *</label>
-                            <input type="email" id="email" name="email" required>
+                            <input type="email" id="email" name="email" value="miguel@test.com" required>
                         </div>
 
                         <div class="form-group">
                             <label for="telefono">Teléfono *</label>
-                            <input type="tel" id="telefono" name="telefono" required>
+                            <input type="tel" id="telefono" name="telefono" value="+34 612 345 678" required>
                         </div>
 
                         <div class="form-group">
                             <label for="direccion">Dirección *</label>
-                            <input type="text" id="direccion" name="direccion" required>
+                            <input type="text" id="direccion" name="direccion" value="Calle Mayor 123" required>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="ciudad">Ciudad *</label>
-                                <input type="text" id="ciudad" name="ciudad" required>
+                                <input type="text" id="ciudad" name="ciudad" value="Oviedo" required>
                             </div>
 
                             <div class="form-group">
-                                <label for="codigo-postal">C.P. *</label>
-                                <input type="text" id="codigo-postal" name="codigo-postal" required>
+                                <label for="codigo-postal">Código postal *</label>
+                                <input type="text" id="codigo-postal" name="codigo-postal" value="33001" required>
                             </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pais">País *</label>
+                            <select id="pais" name="pais" required>
+                                <option value="ES" selected>España</option>
+                                <option value="FR">Francia</option>
+                                <option value="PT">Portugal</option>
+                                <option value="IT">Italia</option>
+                            </select>
                         </div>
                     </form>
 
                     <!-- Método de pago -->
                     <div class="metodo-pago">
-                        <h2>Método de pago</h2>
+                        <h2>💳 Método de pago</h2>
                         
                         <div class="pago-opciones">
-                            <label class="pago-opcion">
-                                <input type="radio" name="metodo-pago" value="paypal" checked>
-                                <span class="pago-label">
-                                    <strong>PayPal</strong>
-                                    <small>Pago seguro con PayPal</small>
-                                </span>
-                            </label>
-
-                            <label class="pago-opcion">
-                                <input type="radio" name="metodo-pago" value="redsys">
-                                <span class="pago-label">
-                                    <strong>Tarjeta de crédito</strong>
-                                    <small>TPV Virtual Redsys</small>
-                                </span>
-                            </label>
+                            <div class="pago-opcion">
+                                <input type="radio" id="paypal" name="pago_metodo" value="paypal" checked>
+                                <label for="paypal">
+                                    <span class="pago-icono">💳</span>
+                                    PayPal
+                                </label>
+                            </div>
+                            <div class="pago-opcion">
+                                <input type="radio" id="redsys" name="pago_metodo" value="redsys">
+                                <label for="redsys">
+                                    <span class="pago-icono">🔒</span>
+                                    Tarjeta de crédito (Redsys TPV)
+                                </label>
+                            </div>
                         </div>
 
-                        <!-- Botón PayPal (se mostrará solo si está seleccionado) -->
-                        <div id="paypal-button-container" style="margin-top: 1.5rem;"></div>
-
-                        <!-- Botón Redsys (se mostrará solo si está seleccionado) -->
-                        <div id="redsys-container" style="display: none; margin-top: 1.5rem;">
-                            <button id="btn-pagar-redsys" class="btn btn-primary btn-block">
-                                Pagar con tarjeta
+                        <!-- CONTENEDORES DE PAGO -->
+                        <!-- PayPal Button Container -->
+                        <div id="paypal-button-container" class="payment-container" style="margin-top: 20px;"></div>
+                        
+                        <!-- Redsys Button Container -->
+                        <div id="redsys-button-container" class="payment-container" style="margin-top: 20px; display: none;">
+                            <button type="button" id="btn-pagar-redsys" class="btn-pago-redsys">
+                                🔒 Pagar con Tarjeta (Redsys)
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Resumen del pedido -->
+                <!-- Resumen de la compra -->
                 <div class="checkout-resumen">
-                    <h2>Resumen del pedido</h2>
+                    <h2>📋 Resumen de compra</h2>
                     
-                    <div id="resumen-productos" class="resumen-productos">
+                    <div class="resumen-productos" id="resumen-productos">
                         <!-- Se llena dinámicamente -->
                     </div>
 
@@ -119,7 +140,7 @@
                         
                         <div class="resumen-linea">
                             <span>Envío:</span>
-                            <span id="checkout-envio">€4.95</span>
+                            <span id="checkout-envio">Gratis</span>
                         </div>
                         
                         <div class="resumen-linea resumen-total">
@@ -132,138 +153,297 @@
         </div>
     </section>
 
-    <!-- PayPal SDK (reemplaza TU_CLIENT_ID con tu Client ID de PayPal Sandbox) -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AWhVQYYnWaffqykoGvgsUJFlLdpO9jAnZUwOIv4_KF1JlFqQeLC1BCT7XUSNJtmJkzJ4Saz8SfEvEUNQ&currency=EUR"></script>
-    
+    <!-- El footer se genera dinámicamente con JavaScript -->
+
     <!-- Scripts -->
     <script src="js/config.js"></script>
-    <script src="js/main.js?v=2.0"></script>
+    <script src="js/main.js"></script>
     <script src="js/footer.js"></script>
+    <script src="js/elegant-interactions.js"></script>
     <script>
-        // Cargar resumen al iniciar
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inicializar elementos del sitio (incluye el logo)
+        // VARIABLES GLOBALES
+        let carritoItems = [];
+        let totalAmount = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎨 Página Checkout cargada');
+            
+            // Inicializar elementos del sitio
             initializeSiteElements();
             
-            // Verificar carrito y mostrar resumen
-            if (typeof carrito !== 'undefined' && carrito.items && carrito.items.length === 0) {
-                alert('Tu carrito está vacío');
-                window.location.href = 'index.html';
-                return;
-            }
+            // Cargar resumen de compra
+            cargarResumenCheckout();
             
-            // Verificar también localStorage como fallback
-            let carritoItems = [];
-            try {
-                const carritoLS = localStorage.getItem('carrito');
-                if (carritoLS) {
-                    carritoItems = JSON.parse(carritoLS);
-                }
-            } catch (error) {
-                console.error('Error parsing carrito:', error);
-            }
+            // Configurar métodos de pago
+            configurarMetodosPago();
             
-            if (carritoItems.length === 0 && (!carrito || !carrito.items || carrito.items.length === 0)) {
-                alert('Tu carrito está vacío');
-                window.location.href = 'index.html';
-                return;
-            }
-
-            // Usar la función original de mostrar resumen
-            if (typeof mostrarResumenCheckout === 'function') {
-                mostrarResumenCheckout();
-            } else {
-                // Fallback si no existe
-                mostrarResumenCheckoutDirecto(carritoItems);
-            }
+            // Inicializar PayPal
+            inicializarPayPal();
             
             // Actualizar contador del carrito
+            if (typeof updateCartCounter === 'function') {
+                updateCartCounter();
+            }
             if (typeof carrito !== 'undefined' && carrito.actualizarContador) {
                 carrito.actualizarContador();
             }
-            updateCartCounter();
             
-            // Inicializar funcionalidades de pago (tu código original)
-            if (typeof inicializarPayPal === 'function') {
-                inicializarPayPal();
-            }
-            manejarCambioMetodoPago();
+            console.log('✅ Checkout completamente inicializado');
         });
 
-        // Función de fallback para mostrar resumen (por si acaso)
-        function mostrarResumenCheckoutDirecto(items) {
-            console.log('📦 Mostrando resumen con', items.length, 'productos');
+        function cargarResumenCheckout() {
+            console.log('📋 Cargando resumen del checkout');
             
-            const resumenProductos = document.getElementById('resumen-productos');
-            if (resumenProductos) {
-                const html = items.map(item => `
-                    <div class="resumen-item">
-                        <div class="resumen-item-info">
-                            <h4>${item.name}</h4>
-                            <p>Cantidad: ${item.cantidad || 1} x €${item.price}</p>
-                        </div>
-                        <div class="resumen-item-precio">
-                            €${(item.price * (item.cantidad || 1)).toFixed(2)}
-                        </div>
-                    </div>
-                `).join('');
+            try {
+                carritoItems = JSON.parse(localStorage.getItem('carrito') || '[]');
                 
-                resumenProductos.innerHTML = html;
+                if (carritoItems.length === 0) {
+                    alert('El carrito está vacío');
+                    window.location.href = 'carrito.html';
+                    return;
+                }
+                
+                totalAmount = 0;
+                const resumenHTML = carritoItems.map(item => {
+                    const cantidad = item.cantidad || 1;
+                    const precioTotal = item.price * cantidad;
+                    totalAmount += precioTotal;
+                    
+                    return `
+                        <div class="resumen-item">
+                            <div class="resumen-item-info">
+                                <h4>${item.name}</h4>
+                                <p>Cantidad: ${cantidad} × €${item.price.toFixed(2)}</p>
+                            </div>
+                            <div class="resumen-item-precio">€${precioTotal.toFixed(2)}</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                document.getElementById('resumen-productos').innerHTML = resumenHTML;
+                document.getElementById('checkout-subtotal').textContent = `€${totalAmount.toFixed(2)}`;
+                document.getElementById('checkout-total').textContent = `€${totalAmount.toFixed(2)}`;
+                
+                console.log('✅ Resumen cargado. Total:', totalAmount.toFixed(2));
+                
+            } catch (error) {
+                console.error('❌ Error cargando resumen:', error);
+                window.location.href = 'carrito.html';
             }
-            
-            // Calcular totales
-            const subtotal = items.reduce((total, item) => {
-                return total + (item.price * (item.cantidad || 1));
-            }, 0);
-            
-            const envio = 4.95;
-            const total = subtotal + envio;
-            
-            // Actualizar totales en la interfaz
-            const subtotalElement = document.getElementById('checkout-subtotal');
-            const totalElement = document.getElementById('checkout-total');
-            
-            if (subtotalElement) subtotalElement.textContent = `€${subtotal.toFixed(2)}`;
-            if (totalElement) totalElement.textContent = `€${total.toFixed(2)}`;
         }
 
-        // Cambiar método de pago
-        function manejarCambioMetodoPago() {
-            const radios = document.querySelectorAll('input[name="metodo-pago"]');
+        function configurarMetodosPago() {
+            console.log('⚙️ Configurando métodos de pago');
+            
+            const radios = document.querySelectorAll('input[name="pago_metodo"]');
+            const paypalContainer = document.getElementById('paypal-button-container');
+            const redsysContainer = document.getElementById('redsys-button-container');
             
             radios.forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    if (e.target.value === 'paypal') {
-                        document.getElementById('paypal-button-container').style.display = 'block';
-                        document.getElementById('redsys-container').style.display = 'none';
-                    } else {
-                        document.getElementById('paypal-button-container').style.display = 'none';
-                        document.getElementById('redsys-container').style.display = 'block';
+                radio.addEventListener('change', function() {
+                    if (this.value === 'paypal') {
+                        paypalContainer.style.display = 'block';
+                        redsysContainer.style.display = 'none';
+                        console.log('📱 PayPal seleccionado');
+                    } else if (this.value === 'redsys') {
+                        paypalContainer.style.display = 'none';
+                        redsysContainer.style.display = 'block';
+                        console.log('🔒 Redsys seleccionado');
                     }
                 });
             });
-        }
-
-        // Pago con Redsys (tu código original)
-        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Configurar botón Redsys
             const btnRedsys = document.getElementById('btn-pagar-redsys');
             if (btnRedsys) {
-                btnRedsys.addEventListener('click', async () => {
-                    if (!validarFormulario()) {
-                        alert('Por favor, completa todos los campos');
-                        return;
-                    }
-
-                    // Aquí iría la integración real con Redsys
-                    alert('Pago con Redsys - Por implementar');
-                });
+                btnRedsys.addEventListener('click', procesarPagoRedsys);
+                console.log('✅ Botón Redsys configurado');
             }
-        });
-
-        function validarFormulario() {
-            const form = document.getElementById('form-checkout');
-            return form.checkValidity();
         }
+
+        function inicializarPayPal() {
+            console.log('💳 Inicializando PayPal');
+            
+            if (typeof paypal === 'undefined') {
+                console.error('❌ PayPal SDK no disponible');
+                setTimeout(inicializarPayPal, 1000);
+                return;
+            }
+            
+            paypal.Buttons({
+                style: {
+                    layout: 'vertical',
+                    color: 'gold',
+                    shape: 'rect',
+                    tagline: false
+                },
+                createOrder: function(data, actions) {
+                    console.log('💰 Creando orden PayPal por:', totalAmount.toFixed(2), 'EUR');
+                    
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: totalAmount.toFixed(2),
+                                currency_code: 'EUR'
+                            }
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        console.log('✅ Pago PayPal completado:', details);
+                        procesarPagoCompletado(details, 'paypal');
+                    });
+                },
+                onError: function(err) {
+                    console.error('❌ Error PayPal:', err);
+                    alert('Error procesando el pago con PayPal. Inténtalo de nuevo.');
+                },
+                onCancel: function(data) {
+                    console.log('⚠️ Usuario canceló el pago PayPal');
+                }
+            }).render('#paypal-button-container').then(() => {
+                console.log('✅ PayPal buttons renderizados');
+            }).catch(err => {
+                console.error('❌ Error renderizando PayPal:', err);
+            });
+        }
+
+        async function procesarPagoCompletado(details, method) {
+            try {
+                console.log('📤 Procesando pago completado:', method);
+                
+                // Validar formulario
+                const nombre = document.getElementById('nombre').value;
+                const email = document.getElementById('email').value;
+                
+                if (!nombre || !email) {
+                    alert('Por favor completa todos los campos requeridos');
+                    return;
+                }
+
+                // Preparar datos del pedido
+                const orderData = {
+                    customer_name: nombre,
+                    customer_email: email,
+                    total_amount: totalAmount.toFixed(2),
+                    status: 'paid',
+                    payment_id: details.id || details.orderID || Date.now().toString(),
+                    payment_method: method,
+                    items: carritoItems
+                };
+
+                console.log('📤 Enviando pedido a la API:', orderData);
+
+                // Enviar a la API
+                const response = await fetch('api/pedidos.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                const result = await response.json();
+                
+                if (result && result.success) {
+                    console.log('✅ Pedido guardado en la API:', result.reference);
+                    localStorage.removeItem('carrito');
+                    alert('¡Pago completado con éxito!');
+                    window.location.href = 'mis-compras.html';
+                } else {
+                    console.warn('⚠️ Error en API, pero pago fue exitoso');
+                    localStorage.removeItem('carrito');
+                    alert('Pago procesado correctamente');
+                    window.location.href = 'mis-compras.html';
+                }
+
+            } catch (error) {
+                console.error('❌ Error procesando pago:', error);
+                alert('Pago completado, redirigiendo...');
+                localStorage.removeItem('carrito');
+                window.location.href = 'mis-compras.html';
+            }
+        }
+
+        function procesarPagoRedsys() {
+            console.log('🔒 Iniciando pago con Redsys...');
+            
+            // Validar formulario
+            const form = document.getElementById('form-checkout');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Validar carrito
+            if (carritoItems.length === 0) {
+                alert('El carrito está vacío');
+                return;
+            }
+
+            const orderData = {
+                customerName: document.getElementById('nombre').value,
+                customerEmail: document.getElementById('email').value,
+                productos: carritoItems,
+                totalAmount: totalAmount.toFixed(2)
+            };
+
+            console.log('📤 Enviando a Redsys:', orderData);
+
+            fetch('redsys/iniciar_pago.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    console.log('✅ Redsys preparado, redirigiendo...');
+                    
+                    // Crear formulario para Redsys
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = data.redsys_url;
+                    
+                    const fields = {
+                        'Ds_SignatureVersion': data.Ds_SignatureVersion,
+                        'Ds_MerchantParameters': data.Ds_MerchantParameters,
+                        'Ds_Signature': data.Ds_Signature
+                    };
+                    
+                    Object.keys(fields).forEach(key => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = fields[key];
+                        form.appendChild(input);
+                    });
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                } else {
+                    alert('Error iniciando pago con Redsys: ' + (data.message || 'Error desconocido'));
+                }
+            })
+            .catch(error => {
+                console.error('Error Redsys:', error);
+                alert(`Error procesando pago con Redsys: ${error.message}`);
+            });
+        }
+
+        // FUNCIONES GLOBALES PARA COMPATIBILIDAD
+        window.inicializarSelectorPago = configurarMetodosPago;
+        window.procesarPagoRedsys = procesarPagoRedsys;
+
+        console.log('📄 Script checkout completamente cargado');
     </script>
 </body>
 </html>

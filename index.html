@@ -3,34 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Origen Puro Coffee - Café de Especialidad</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>Origen Puro Coffee - Café de Especialidad Premium</title>
+    <meta name="description" content="Descubre cafés excepcionales de las mejores regiones del mundo. Granos selectos tostados artesanalmente para una experiencia única.">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/styles-elegant.css">
 </head>
 <body>
-    <!-- HEADER -->
+    <!-- HEADER FIJO ELEGANTE -->
     <header class="header">
-        <div class="container">
-            <div class="header-content">
+        <div class="header-content">
+            <div class="logo">
                 <div class="logo">
-                    <!-- Se actualizará dinámicamente con JavaScript -->
+                    <img src="img/logo.png" alt="Origen Puro Coffee" class="header-logo-image">
                 </div>
-                <nav class="nav">
-                    <a href="index.html">Inicio</a>
-                    <a href="mis-compras.html">Mis Compras</a>
-                    <a href="carrito.html" class="cart-link">
-                        🛒 Carrito (<span id="cart-count">0</span>)
-                    </a>
-                </nav>
             </div>
+            <nav class="nav">
+                <a href="index.html">Inicio</a>
+                <a href="mis-compras.html">Mis Compras</a>
+                <a href="carrito.html" class="cart-link">
+                    🛒 Carrito (<span id="cart-count">0</span>)
+                </a>
+            </nav>
         </div>
     </header>
 
-    <!-- HERO SECTION -->
+    <!-- HERO ELEGANTE CON IMAGEN DE FONDO -->
     <section class="hero">
         <!-- Elementos decorativos flotantes -->
-        <div class="hero-floating" style="font-size: 3rem;">☕</div>
-        <div class="hero-floating" style="font-size: 2.5rem;">🌱</div>
-        <div class="hero-floating" style="font-size: 2rem;">⭐</div>
+        <div class="hero-floating">☕</div>
+        <div class="hero-floating">🌱</div>
+        <div class="hero-floating">⭐</div>
         
         <div class="container">
             <div class="hero-content">
@@ -42,6 +52,8 @@
             </div>
         </div>
     </section>
+
+    <!-- SECCIÓN DE CARACTERÍSTICAS (Se agrega dinámicamente) -->
 
     <!-- PRODUCTOS DESTACADOS -->
     <section class="productos-section">
@@ -68,6 +80,7 @@
     <script src="js/config.js"></script>
     <script src="js/main.js"></script>
     <script src="js/footer.js"></script>
+    <script src="js/elegant-interactions.js"></script>
     <script>
         // Cargar productos al iniciar
         document.addEventListener('DOMContentLoaded', () => {
@@ -87,6 +100,9 @@
                 carrito.actualizarContador();
                 updateCartCounter();
             }
+            
+            // Log para debug del nuevo diseño
+            console.log('🎨 Diseño elegante iniciado');
         });
     </script>
 </body>

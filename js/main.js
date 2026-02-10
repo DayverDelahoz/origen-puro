@@ -3,6 +3,9 @@
 // ========================================
 
 const API_URL = 'http://localhost:8080/api';
+const API_PHP = 'api/productos.php'; // Nuevo endpoint PHP para productos
+const API_PHP_PEDIDOS = 'api/pedidos.php'; // Nuevo endpoint PHP para pedidos  
+const API_PHP_PAYPAL = 'pagos/paypal.php'; // Nuevo endpoint PHP para PayPal
 const COSTO_ENVIO = 4.95;
 
 // ========================================
@@ -80,34 +83,72 @@ class Carrito {
             contador.textContent = total;
         }
     }
+
+    obtenerCantidadTotal() {
+        return this.items.reduce((sum, item) => sum + item.cantidad, 0);
+    }
 }
 
 // Instancia global del carrito
 const carrito = new Carrito();
 
 // ========================================
-// FUNCIONES PARA PÁGINA PRINCIPAL
+// FUNCIONES PARA PÁGINA PRINCIPAL (MIGRADAS A PHP)
 // ========================================
 
 async function cargarProductosTop() {
     try {
-        const response = await fetch(`${API_URL}/products/top`);
+        console.log('📦 Cargando productos TOP desde PHP...');
+        const response = await fetch(`${API_PHP}?tipo=top`);
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
         const productos = await response.json();
+        console.log('✅ Productos TOP cargados desde PHP:', productos.length);
         
         mostrarProductos(productos, 'productos-top');
     } catch (error) {
-        console.error('Error cargando productos destacados:', error);
+        console.error('❌ Error cargando productos destacados desde PHP:', error);
+        // Fallback a API original si falla PHP
+        try {
+            console.log('🔄 Intentando con API Node.js...');
+            const response = await fetch(`${API_URL}/products/top`);
+            const productos = await response.json();
+            console.log('✅ Productos TOP cargados desde Node.js (fallback)');
+            mostrarProductos(productos, 'productos-top');
+        } catch (fallbackError) {
+            console.error('❌ Fallback también falló:', fallbackError);
+        }
     }
 }
 
 async function cargarTodosProductos() {
     try {
-        const response = await fetch(`${API_URL}/products`);
+        console.log('📦 Cargando TODOS los productos desde PHP...');
+        const response = await fetch(`${API_PHP}?tipo=all`);
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
         const productos = await response.json();
+        console.log('✅ Todos los productos cargados desde PHP:', productos.length);
         
         mostrarProductos(productos, 'productos-todos');
     } catch (error) {
-        console.error('Error cargando productos:', error);
+        console.error('❌ Error cargando productos desde PHP:', error);
+        // Fallback a API original si falla PHP
+        try {
+            console.log('🔄 Intentando con API Node.js...');
+            const response = await fetch(`${API_URL}/products`);
+            const productos = await response.json();
+            console.log('✅ Todos los productos cargados desde Node.js (fallback)');
+            mostrarProductos(productos, 'productos-todos');
+        } catch (fallbackError) {
+            console.error('❌ Fallback también falló:', fallbackError);
+        }
     }
 }
 
@@ -174,17 +215,17 @@ function obtenerOrigen(nombre) {
 }
 
 // ========================================
-// FUNCIONES PARA PÁGINA DE PRODUCTO
+// FUNCIONES PARA PÁGINA DE PRODUCTO (MIGRADA A PHP)
 // ========================================
 
 async function cargarProducto(id) {
     try {
-        console.log('Intentando cargar producto ID:', id);
-        console.log('URL de la API:', `${API_URL}/products/${id}`);
+        console.log('📦 Cargando producto desde PHP, ID:', id);
+        console.log('🌐 URL PHP:', `${API_PHP}?id=${id}`);
         
-        const response = await fetch(`${API_URL}/products/${id}`);
+        const response = await fetch(`${API_PHP}?id=${id}`);
         
-        console.log('Respuesta de la API:', response.status, response.statusText);
+        console.log('📡 Respuesta PHP:', response.status, response.statusText);
         
         if (!response.ok) {
             throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
@@ -192,11 +233,11 @@ async function cargarProducto(id) {
         
         let producto = await response.json();
         
-        console.log('Datos recibidos:', producto);
+        console.log('📄 Datos recibidos desde PHP:', producto);
         
         // FIX: Si la API devuelve un array, tomar el primer elemento
         if (Array.isArray(producto)) {
-            console.log('API devolvió array, tomando primer elemento');
+            console.log('📋 API devolvió array, tomando primer elemento');
             producto = producto[0];
         }
         
@@ -209,25 +250,61 @@ async function cargarProducto(id) {
         // Guardar producto en variable global para agregar al carrito
         window.productoActual = producto;
         
-        console.log('Producto cargado exitosamente');
+        console.log('✅ Producto cargado exitosamente desde PHP');
         
     } catch (error) {
-        console.error('❌ ERROR COMPLETO:', error);
-        console.error('Detalles del error:', error.message);
+        console.error('❌ ERROR cargando producto desde PHP:', error);
+        console.error('🔍 Detalles del error:', error.message);
         
-        // Mostrar error en la página en lugar de redirigir
-        const nombreElement = document.getElementById('producto-nombre');
-        const descripcionElement = document.querySelector('.producto-info .producto-descripcion p');
-        
-        if (nombreElement) {
-            nombreElement.textContent = 'Error cargando producto';
-        }
-        
-        if (descripcionElement) {
-            descripcionElement.innerHTML = `
-                <strong>Error:</strong> ${error.message}<br><br>
-                <a href="index.html" class="btn btn-primary">Volver a la tienda</a>
-            `;
+        // Fallback a API original
+        try {
+            console.log('🔄 Intentando con API Node.js...');
+            console.log('🌐 URL Node.js:', `${API_URL}/products/${id}`);
+            
+            const response = await fetch(`${API_URL}/products/${id}`);
+            
+            console.log('📡 Respuesta Node.js:', response.status, response.statusText);
+            
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
+            }
+            
+            let producto = await response.json();
+            
+            console.log('📄 Datos recibidos desde Node.js:', producto);
+            
+            // FIX: Si la API devuelve un array, tomar el primer elemento
+            if (Array.isArray(producto)) {
+                console.log('📋 API devolvió array, tomando primer elemento');
+                producto = producto[0];
+            }
+            
+            if (!producto || !producto.id) {
+                throw new Error('Producto inválido o vacío');
+            }
+            
+            mostrarDetalleProducto(producto);
+            window.productoActual = producto;
+            
+            console.log('✅ Producto cargado exitosamente desde Node.js (fallback)');
+            
+        } catch (fallbackError) {
+            console.error('❌ Fallback también falló:', fallbackError);
+            
+            // Mostrar error en la página en lugar de redirigir
+            const nombreElement = document.getElementById('producto-nombre');
+            const descripcionElement = document.querySelector('.producto-info .producto-descripcion p');
+            
+            if (nombreElement) {
+                nombreElement.textContent = 'Error cargando producto';
+            }
+            
+            if (descripcionElement) {
+                descripcionElement.innerHTML = `
+                    <strong>Error:</strong> ${fallbackError.message}<br><br>
+                    <a href="index.html" class="btn btn-primary">Volver a la tienda</a>
+                `;
+            }
         }
     }
 }
@@ -489,7 +566,7 @@ function inicializarPayPal() {
 }
 
 // ========================================
-// API - CREAR PEDIDO
+// API - CREAR PEDIDO (MIGRADO A PHP)
 // ========================================
 
 async function crearPedidoEnAPI(estado = 'created', referenciaExterna = '') {
@@ -505,7 +582,9 @@ async function crearPedidoEnAPI(estado = 'created', referenciaExterna = '') {
             status: estado
         };
         
-        const response = await fetch(`${API_URL}/orders`, {
+        console.log('📤 Enviando pedido a PHP API:', pedido);
+        
+        const response = await fetch(API_PHP_PEDIDOS, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -514,11 +593,16 @@ async function crearPedidoEnAPI(estado = 'created', referenciaExterna = '') {
         });
         
         if (!response.ok) {
-            throw new Error('Error al crear el pedido');
+            throw new Error(`Error HTTP: ${response.status}`);
         }
         
         const resultado = await response.json();
-        console.log('Pedido creado:', resultado);
+        
+        if (resultado.error) {
+            throw new Error(resultado.message);
+        }
+        
+        console.log('✅ Pedido creado via PHP:', resultado);
         
         // Guardar pedido en historial local
         guardarPedidoEnHistorial({
@@ -532,8 +616,53 @@ async function crearPedidoEnAPI(estado = 'created', referenciaExterna = '') {
         return resultado;
         
     } catch (error) {
-        console.error('Error creando pedido:', error);
-        throw error;
+        console.error('❌ Error creando pedido via PHP:', error);
+        
+        // Fallback a Node.js directo si falla PHP
+        try {
+            console.log('🔄 Intentando crear pedido directo en Node.js...');
+            
+            const nombreUsuario = document.getElementById('nombre')?.value || 'usuario_invitado';
+            const referencia = `REF_${Date.now()}`;
+            
+            const pedido = {
+                reference: referencia,
+                user: nombreUsuario,
+                total_amount: carrito.obtenerTotal(),
+                product_count: carrito.items.length,
+                status: estado
+            };
+            
+            const response = await fetch(`${API_URL}/orders`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(pedido)
+            });
+            
+            if (!response.ok) {
+                throw new Error('Error al crear el pedido');
+            }
+            
+            const resultado = await response.json();
+            console.log('✅ Pedido creado en Node.js (fallback):', resultado);
+            
+            // Guardar pedido en historial local
+            guardarPedidoEnHistorial({
+                ...pedido,
+                id: resultado.id || Date.now(),
+                productos: [...carrito.items],
+                fecha: new Date().toISOString(),
+                referencia_pago: referenciaExterna
+            });
+            
+            return resultado;
+            
+        } catch (fallbackError) {
+            console.error('❌ Fallback también falló:', fallbackError);
+            throw fallbackError;
+        }
     }
 }
 
@@ -633,6 +762,10 @@ function irAMisCompras() {
     window.location.href = 'mis-compras.html';
 }
 
+// ========================================
+// FUNCIÓN MOSTRAR PEDIDOS ACTUALIZADA
+// ========================================
+// Esta función debe reemplazar la función mostrarPedidos existente en main.js
 
 function mostrarPedidos() {
     console.log('📦 Cargando página Mis Compras...');
@@ -651,13 +784,13 @@ function mostrarPedidos() {
     
     if (historial.length === 0) {
         console.log('⚠️ No hay pedidos para mostrar');
-        sinPedidos.style.display = 'block';
+        if (sinPedidos) sinPedidos.style.display = 'block';
         listaPedidos.style.display = 'none';
         return;
     }
     
     console.log('✅ Mostrando', historial.length, 'pedidos');
-    sinPedidos.style.display = 'none';
+    if (sinPedidos) sinPedidos.style.display = 'none';
     listaPedidos.style.display = 'block';
     listaPedidos.innerHTML = '';
     
@@ -666,18 +799,16 @@ function mostrarPedidos() {
         
         const fecha = new Date(pedido.fecha);
         const fechaFormateada = fecha.toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'long',
             day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+            month: 'long',
+            year: 'numeric'
         });
         
-        const estadoClase = pedido.status === 'paid' ? 'estado-pagado' : 
+        const estadoClase = pedido.status === 'paid' ? 'estado-completado' : 
                            pedido.status === 'canceled' ? 'estado-cancelado' : 
                            'estado-creado';
         
-        const estadoTexto = pedido.status === 'paid' ? 'Pagado' : 
+        const estadoTexto = pedido.status === 'paid' ? 'Completado' : 
                            pedido.status === 'canceled' ? 'Cancelado' : 
                            'Pendiente';
         
@@ -686,32 +817,32 @@ function mostrarPedidos() {
         pedidoDiv.innerHTML = `
             <div class="pedido-header">
                 <div>
-                    <h3>Pedido ${pedido.reference}</h3>
+                    <h3>OPC-${pedido.reference.replace('REF_', '').substring(0, 8)}</h3>
                     <p class="pedido-fecha">${fechaFormateada}</p>
                 </div>
                 <span class="pedido-estado ${estadoClase}">${estadoTexto}</span>
             </div>
             
             <div class="pedido-productos">
-                <div class="pedido-productos-titulo">Productos</div>
                 ${pedido.productos.map(item => {
-                    const precio = carrito.calcularPrecioFinal(item.price, item.discount);
+                    const precio = carrito ? carrito.calcularPrecioFinal(item.price, item.discount || 0) : item.price;
                     return `
                         <div class="pedido-producto-item">
-                            <span class="pedido-producto-nombre">${item.cantidad}x ${item.name}</span>
-                            <span class="pedido-producto-precio">€${(precio * item.cantidad).toFixed(2)}</span>
+                            <img src="${item.main_image || item.image || 'img/default-coffee.jpg'}" alt="${item.name}">
+                            <div class="pedido-producto-info">
+                                <div class="pedido-producto-nombre">${item.name}</div>
+                                <div class="pedido-producto-detalle">x${item.cantidad}</div>
+                            </div>
+                            <div class="pedido-producto-precio">€${(precio * item.cantidad).toFixed(2)}</div>
                         </div>
                     `;
                 }).join('')}
             </div>
             
             <div class="pedido-footer">
-                <div class="pedido-total">
-                    <strong>Total:</strong>
-                    <strong>€${pedido.total_amount.toFixed(2)}</strong>
-                </div>
+                <div class="pedido-total">Total: €${pedido.total_amount.toFixed(2)}</div>
                 ${pedido.referencia_pago ? `
-                    <p class="pedido-referencia">ID: ${pedido.referencia_pago.substring(0, 16)}...</p>
+                    <div class="pedido-referencia">ID: ${pedido.referencia_pago.substring(0, 16)}...</div>
                 ` : ''}
             </div>
         `;

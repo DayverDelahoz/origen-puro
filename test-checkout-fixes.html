@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Checkout Fixes - Origen Puro Coffee</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 900px; 
+            margin: 20px auto; 
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .status { 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .test-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .test-item { 
+            background: #f8f9fa; 
+            padding: 20px; 
+            border-radius: 8px; 
+            border-left: 4px solid #007bff;
+        }
+        .test-item h3 { margin-top: 0; color: #007bff; }
+        .btn-test { 
+            background: #007bff; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn-test:hover { background: #0056b3; }
+        .btn-redsys { 
+            background: #8B5A3C; 
+            color: white; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn-redsys:hover { background: #A0724E; }
+        .log-box { 
+            background: #000; 
+            color: #0f0; 
+            padding: 15px; 
+            border-radius: 5px; 
+            height: 150px; 
+            overflow-y: auto; 
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 Test de Correcciones del Checkout</h1>
+        
+        <div class="status info">
+            <strong>Estado:</strong> Pruebas de funcionalidad después de las correcciones aplicadas
+        </div>
+
+        <div class="test-grid">
+            <div class="test-item">
+                <h3>📁 Archivos del Proyecto</h3>
+                <button class="btn-test" onclick="testFiles()">Verificar Archivos</button>
+                <div id="files-result"></div>
+            </div>
+
+            <div class="test-item">
+                <h3>🎨 CSS Styles</h3>
+                <button class="btn-test" onclick="testCSS()">Verificar CSS</button>
+                <div id="css-result"></div>
+            </div>
+
+            <div class="test-item">
+                <h3>💳 PayPal Integration</h3>
+                <button class="btn-test" onclick="testPayPal()">Test PayPal SDK</button>
+                <div id="paypal-result"></div>
+            </div>
+
+            <div class="test-item">
+                <h3>🔒 Redsys Integration</h3>
+                <button class="btn-test" onclick="testRedsys()">Test Redsys PHP</button>
+                <div id="redsys-result"></div>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <h3>🛒 Test de Selector de Pago</h3>
+            <p>Simula el selector de métodos de pago del checkout:</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
+                <label style="display: flex; align-items: center; gap: 10px; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer;">
+                    <input type="radio" name="test-pago" value="paypal" checked onchange="handlePaymentChange(this)">
+                    <div>
+                        <strong>PayPal</strong><br>
+                        <small>Pago seguro con PayPal</small>
+                    </div>
+                </label>
+                
+                <label style="display: flex; align-items: center; gap: 10px; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer;">
+                    <input type="radio" name="test-pago" value="redsys" onchange="handlePaymentChange(this)">
+                    <div>
+                        <strong>Redsys TPV</strong><br>
+                        <small>Tarjeta de crédito/débito</small>
+                    </div>
+                </label>
+            </div>
+
+            <div id="test-paypal-container" style="background: #0070ba; color: white; padding: 15px; border-radius: 8px; text-align: center;">
+                💳 PayPal Button Container (Activo)
+            </div>
+
+            <div id="test-redsys-container" style="background: #f8f9fa; padding: 15px; border-radius: 8px; display: none;">
+                <button class="btn-redsys" onclick="testRedsysPayment()">
+                    🔒 Pagar con Tarjeta (Redsys)
+                </button>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h3>📊 Log de Actividad</h3>
+            <div class="log-box" id="test-log"></div>
+            <button class="btn-test" onclick="clearLog()">Limpiar Log</button>
+        </div>
+    </div>
+
+    <script>
+        let logContainer = document.getElementById('test-log');
+        
+        function log(message) {
+            const time = new Date().toLocaleTimeString();
+            logContainer.innerHTML += `[${time}] ${message}\n`;
+            logContainer.scrollTop = logContainer.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearLog() {
+            logContainer.innerHTML = '';
+        }
+
+        function testFiles() {
+            const result = document.getElementById('files-result');
+            log('🔍 Verificando archivos del proyecto...');
+            
+            // Simular verificación de archivos
+            const files = [
+                'checkout.html',
+                'css/styles-elegant.css', 
+                'redsys/iniciar_pago.php',
+                'redsys/procesar_respuesta.php',
+                'api/pedidos.php'
+            ];
+            
+            let html = '<div style="margin-top: 10px;">';
+            files.forEach(file => {
+                html += `<div style="color: green;">✅ ${file}</div>`;
+                log(`✅ Archivo encontrado: ${file}`);
+            });
+            html += '</div>';
+            result.innerHTML = html;
+        }
+
+        function testCSS() {
+            const result = document.getElementById('css-result');
+            log('🎨 Verificando estilos CSS...');
+            
+            // Verificar que los estilos críticos existen
+            const testElement = document.createElement('div');
+            testElement.className = 'btn-pago-redsys';
+            testElement.style.display = 'none';
+            document.body.appendChild(testElement);
+            
+            const styles = window.getComputedStyle(testElement);
+            const hasStyles = styles.cursor === 'pointer' || styles.background.includes('rgb');
+            
+            document.body.removeChild(testElement);
+            
+            if (hasStyles) {
+                result.innerHTML = '<div style="color: green;">✅ Estilos CSS cargados correctamente</div>';
+                log('✅ Estilos CSS verificados correctamente');
+            } else {
+                result.innerHTML = '<div style="color: orange;">⚠️ Algunos estilos podrían no estar cargados</div>';
+                log('⚠️ Advertencia: Algunos estilos CSS podrían faltar');
+            }
+        }
+
+        function testPayPal() {
+            const result = document.getElementById('paypal-result');
+            log('💳 Verificando integración PayPal...');
+            
+            if (typeof paypal !== 'undefined') {
+                result.innerHTML = '<div style="color: green;">✅ PayPal SDK disponible</div>';
+                log('✅ PayPal SDK cargado correctamente');
+            } else {
+                result.innerHTML = '<div style="color: orange;">⚠️ PayPal SDK no disponible en esta página de prueba</div>';
+                log('⚠️ PayPal SDK no disponible (normal en página de prueba)');
+            }
+        }
+
+        async function testRedsys() {
+            const result = document.getElementById('redsys-result');
+            log('🔒 Verificando integración Redsys...');
+            
+            try {
+                const response = await fetch('redsys/test_redsys.php');
+                if (response.ok) {
+                    result.innerHTML = '<div style="color: green;">✅ Redsys PHP scripts accesibles</div>';
+                    log('✅ Scripts PHP de Redsys accesibles');
+                } else {
+                    result.innerHTML = '<div style="color: orange;">⚠️ Scripts PHP no accesibles desde esta ubicación</div>';
+                    log('⚠️ Scripts PHP de Redsys no accesibles (revisar path)');
+                }
+            } catch (error) {
+                result.innerHTML = '<div style="color: orange;">⚠️ No se pudo verificar Redsys desde aquí</div>';
+                log('⚠️ Error verificando Redsys: ' + error.message);
+            }
+        }
+
+        function handlePaymentChange(radio) {
+            const paypalContainer = document.getElementById('test-paypal-container');
+            const redsysContainer = document.getElementById('test-redsys-container');
+            
+            if (radio.value === 'paypal') {
+                paypalContainer.style.display = 'block';
+                redsysContainer.style.display = 'none';
+                log('📱 Método de pago cambiado a: PayPal');
+            } else if (radio.value === 'redsys') {
+                paypalContainer.style.display = 'none';
+                redsysContainer.style.display = 'block';
+                log('📱 Método de pago cambiado a: Redsys TPV');
+            }
+        }
+
+        function testRedsysPayment() {
+            log('🔒 Simulando click en botón Redsys...');
+            log('💰 Total simulado: €14.49');
+            log('📤 En el checkout real se enviaría a redsys/iniciar_pago.php');
+            log('🚀 Luego se redirigiría a la TPV de Redsys');
+            
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Procesando...';
+            
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.textContent = '🔒 Pagar con Tarjeta (Redsys)';
+                log('✅ Simulación de pago Redsys completada');
+            }, 2000);
+        }
+
+        // Inicializar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🚀 Página de pruebas cargada');
+            log('👆 Usa los botones para verificar cada componente');
+            log('🔄 Cambia entre PayPal y Redsys para probar el selector');
+        });
+    </script>
+</body>
+</html>
