@@ -148,6 +148,69 @@ try {
     <title><?php echo $pageTitle; ?> - Origen Puro Coffee</title>
     <link rel="stylesheet" href="../css/styles-elegant.css">
     <link rel="stylesheet" href="../css/checkout-adicional.css">
+    <style>
+        /* Modal estilo tipo PayPal - añadido localmente para evitar dependencias externas */
+        .modal-overlay{
+            position:fixed;
+            inset:0;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:rgba(16,24,40,0.6);
+            z-index:9999;
+            padding:20px;
+        }
+        .modal-container{
+            width:100%;
+            max-width:840px;
+            background:#fff;
+            border-radius:12px;
+            box-shadow:0 20px 50px rgba(2,6,23,0.4);
+            overflow:hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+        }
+        .modal-header{
+            display:flex;
+            align-items:center;
+            gap:18px;
+            padding:28px 32px;
+            background:linear-gradient(90deg,#0070ba 0%, #003087 100%);
+            color:#fff;
+        }
+        .modal-header.error{ background: linear-gradient(90deg,#d9534f 0%, #b02a37 100%); }
+        .modal-icon{
+            width:72px;
+            height:72px;
+            min-width:72px;
+            min-height:72px;
+            border-radius:50%;
+            background:#fff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            box-shadow:0 6px 18px rgba(2,6,23,0.25);
+        }
+        .modal-icon svg{ width:40px; height:40px; }
+        .modal-header h2{ margin:0; font-size:20px; letter-spacing: -0.2px; }
+        .modal-header p{ margin:0; opacity:0.95; }
+        .modal-body{ display:flex; gap:24px; padding:26px 32px 32px; align-items:flex-start; }
+        .modal-details{ flex:1; }
+        .modal-detail-item{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed #eee; }
+        .modal-detail-label{ color:#6b7280; font-weight:600; }
+        .modal-detail-value{ color:#111827; font-weight:700; }
+        .modal-total{ width:240px; background:linear-gradient(180deg,#f8fafc,#ffffff); border-radius:8px; padding:18px; text-align:center; box-shadow:0 6px 20px rgba(2,6,23,0.06); }
+        .modal-total-label{ display:block; color:#6b7280; font-size:13px; }
+        .modal-total-value{ display:block; font-size:22px; font-weight:800; color:#111827; margin-top:6px; }
+        .modal-footer{ margin-top:18px; }
+        .modal-message{ margin:0 0 12px; color:#374151; }
+        .modal-button{ background:linear-gradient(90deg,#0070ba,#003087); color:#fff; border:0; padding:12px 18px; border-radius:8px; font-weight:700; cursor:pointer; }
+        .modal-button.secondary{ background:#f3f4f6; color:#111827; }
+        .modal-button.error{ background:linear-gradient(90deg,#d9534f,#b02a37); }
+        @media (max-width:640px){
+            .modal-body{ flex-direction:column; }
+            .modal-total{ width:100%; }
+        }
+    </style>
 </head>
 <body>
     <!-- HEADER -->
@@ -249,52 +312,60 @@ try {
                 modal.innerHTML = `
                     <div class="modal-container">
                         <div class="modal-header">
-                            <div class="modal-icon">🎉</div>
-                            <h2>¡Pago realizado con éxito!</h2>
-                            <p>Tu pedido ha sido procesado correctamente</p>
+                            <div class="modal-icon">
+                                <!-- SVG check -->
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="11" stroke="#0070ba" stroke-width="1.5" fill="#fff" />
+                                    <path d="M7.5 12.5l2.5 2.5 6-6" stroke="#0070ba" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h2>Pago realizado con éxito</h2>
+                                <p>Tu pedido ha sido procesado correctamente</p>
+                            </div>
                         </div>
                         <div class="modal-body">
                             <div class="modal-details">
                                 <div class="modal-detail-item">
-                                    <span class="modal-detail-label">💳 Número de pedido:</span>
+                                    <span class="modal-detail-label">Número de pedido</span>
                                     <span class="modal-detail-value">${datos.orderNumber}</span>
                                 </div>
                                 <div class="modal-detail-item">
-                                    <span class="modal-detail-label">📋 Referencia:</span>
+                                    <span class="modal-detail-label">Referencia</span>
                                     <span class="modal-detail-value">${datos.reference}</span>
                                 </div>
                                 <div class="modal-detail-item">
-                                    <span class="modal-detail-label">👤 Cliente:</span>
-                                    <span class="modal-detail-value">${datos.customerName || 'N/A'}</span>
+                                    <span class="modal-detail-label">Cliente</span>
+                                    <span class="modal-detail-value">${datos.customerName || 'N/D'}</span>
                                 </div>
                                 <div class="modal-detail-item">
-                                    <span class="modal-detail-label">💳 Método de pago:</span>
+                                    <span class="modal-detail-label">Método de pago</span>
                                     <span class="modal-detail-value">Redsys (Tarjeta)</span>
                                 </div>
                                 <div class="modal-detail-item">
-                                    <span class="modal-detail-label">🔐 Código autorización:</span>
+                                    <span class="modal-detail-label">Código de autorización</span>
                                     <span class="modal-detail-value">${datos.authorisationCode}</span>
                                 </div>
                                 <div class="modal-detail-item">
-                                    <span class="modal-detail-label">✅ Estado:</span>
+                                    <span class="modal-detail-label">Estado</span>
                                     <span class="modal-detail-value">Pagado</span>
                                 </div>
                                 <div class="modal-detail-item">
-                                    <span class="modal-detail-label">📅 Fecha:</span>
+                                    <span class="modal-detail-label">Fecha</span>
                                     <span class="modal-detail-value">${new Date().toLocaleString('es-ES')}</span>
                                 </div>
                             </div>
                             <div class="modal-total">
-                                <span class="modal-total-label">💰 Total pagado</span>
+                                <span class="modal-total-label">Total pagado</span>
                                 <span class="modal-total-value">€${datos.amount}</span>
                             </div>
                             <div class="modal-footer">
                                 <p class="modal-message">
-                                    <strong>🎉 ¡Gracias por tu compra!</strong><br>
+                                    <strong>Gracias por tu compra</strong><br>
                                     Tu pago con tarjeta se procesó correctamente. Serás redirigido a "Mis Compras" automáticamente.
                                 </p>
                                 <button class="modal-button" onclick="window.parent.location.href='../mis-compras.html'">
-                                    📦 Ver mis compras
+                                    Ver mis compras
                                 </button>
                             </div>
                         </div>
@@ -303,30 +374,39 @@ try {
             } else {
                 modal.innerHTML = `
                     <div class="modal-container">
-                        <div class="modal-header" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
-                            <div class="modal-icon">❌</div>
-                            <h2>Error en el pago</h2>
-                            <p>No se pudo procesar tu pago</p>
+                        <div class="modal-header error">
+                            <div class="modal-icon">
+                                <!-- SVG error -->
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="11" stroke="#b02a37" stroke-width="1.5" fill="#fff" />
+                                    <path d="M15.2 8.8L8.8 15.2M8.8 8.8l6.4 6.4" stroke="#b02a37" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h2>Error en el pago</h2>
+                                <p>No se pudo procesar tu pago</p>
+                            </div>
                         </div>
                         <div class="modal-body">
                             <div class="modal-details">
                                 <div class="modal-detail-item">
-                                    <span class="modal-detail-label">❌ Error:</span>
+                                    <span class="modal-detail-label">Error</span>
                                     <span class="modal-detail-value">${datos.error}</span>
                                 </div>
                                 <div class="modal-detail-item">
-                                    <span class="modal-detail-label">📅 Fecha:</span>
+                                    <span class="modal-detail-label">Fecha</span>
                                     <span class="modal-detail-value">${new Date().toLocaleString('es-ES')}</span>
                                 </div>
                             </div>
                             <div class="modal-footer">
                                 <p class="modal-message">
-                                    <strong>⚠️ Pago no completado</strong><br>
+                                    <strong>Pago no completado</strong><br>
                                     Puedes intentar de nuevo o contactar con soporte.
                                 </p>
-                                <button class="modal-button" onclick="window.parent.location.href='../carrito.html'" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
-                                    <i class="ph ph-shopping-cart"></i> Volver al carrito
-                                </button>
+                                <div style="display:flex;gap:10px;">
+                                    <button class="modal-button secondary" onclick="window.parent.location.href='../carrito.html'">Volver al carrito</button>
+                                    <button class="modal-button error" onclick="window.parent.location.href='../checkout.html'">Intentar de nuevo</button>
+                                </div>
                             </div>
                         </div>
                     </div>
