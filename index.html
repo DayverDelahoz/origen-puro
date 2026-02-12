@@ -3,41 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Origen Puro Coffee - Café de Especialidad</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>Origen Puro Coffee - Café de Especialidad Premium</title>
+    <meta name="description" content="Descubre cafés excepcionales de las mejores regiones del mundo. Granos selectos tostados artesanalmente para una experiencia única.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/styles-elegant.css">
+    <link rel="stylesheet" href="css/header-responsive.css">
+        <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
-    <!-- HEADER -->
+    <!-- HEADER FIJO ELEGANTE -->
     <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <!-- Se actualizará dinámicamente con JavaScript -->
-                </div>
-                <nav class="nav">
-                    <a href="index.html">Inicio</a>
-                    <a href="mis-compras.html">Mis Compras</a>
-                    <a href="carrito.html" class="cart-link">
-                        🛒 Carrito (<span id="cart-count">0</span>)
-                    </a>
-                </nav>
+        <div class="header-content">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="img/logo.png" alt="Origen Puro Coffee" class="header-logo-image">
+                </a>
             </div>
+            
+            <!-- Botón hamburger para móvil -->
+            <button class="menu-toggle" onclick="toggleMenu()">
+                ☰
+            </button>
+            
+            <nav class="nav" id="nav-menu">
+                <a href="index.html">Inicio</a>
+                <a href="mis-compras.html">Mis Compras</a>
+                    <a href="carrito.html" class="cart-link"><i class="ph ph-shopping-cart" aria-hidden="true"></i> Carrito (<span id="cart-count">0</span>)</a>
+                    </nav>
         </div>
     </header>
 
-    <!-- HERO SECTION -->
+    <!-- HERO ELEGANTE CON IMAGEN DE FONDO -->
     <section class="hero">
         <!-- Elementos decorativos flotantes -->
-        <div class="hero-floating" style="font-size: 3rem;">☕</div>
-        <div class="hero-floating" style="font-size: 2.5rem;">🌱</div>
-        <div class="hero-floating" style="font-size: 2rem;">⭐</div>
-        
+        <div class="hero-floating"><i class="ph ph-coffee"></i>></i></div>
+        <div class="hero-floating"><i class="ph ph-leaf"></i></i></div>
+        <div class="hero-floating"><i class="ph ph-star"></i></i></div>
+    
         <div class="container">
             <div class="hero-content">
+                <h1>Origen Puro Coffee</h1>
                 <h2>Descubre cafés excepcionales</h2>
                 <p>Granos selectos de las mejores regiones del mundo, tostados artesanalmente para una experiencia única</p>
                 <div class="hero-badge">
-                    Calidad Premium Garantizada
+                    <i class="ph ph-trophy" aria-hidden="true"></i>
+                    <span class="hero-badge-text">Calidad Premium Garantizada</span>
                 </div>
             </div>
         </div>
@@ -46,46 +61,96 @@
     <!-- PRODUCTOS DESTACADOS -->
     <section class="productos-section">
         <div class="container">
-            <h2 class="section-title">Nuestros Cafés</h2>
+            <h2 class="section-title">Nuestros Cafés Destacados</h2>
             
             <!-- Productos TOP -->
             <div id="productos-top" class="productos-grid">
-                <!-- Se llenan dinámicamente con JavaScript -->
+                <!-- Loading placeholder -->
+                <div class="loading-placeholder">
+                    <p>Cargando productos destacados...</p>
+                </div>
             </div>
 
             <h3 class="section-subtitle">Todos los productos</h3>
             
             <!-- Todos los productos -->
             <div id="productos-todos" class="productos-grid">
-                <!-- Se llenan dinámicamente con JavaScript -->
+                <!-- Loading placeholder -->
+                <div class="loading-placeholder">
+                    <p>Cargando productos...</p>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- El footer se genera dinámicamente con JavaScript -->
 
-    <!-- Scripts -->
+    <!-- Scripts - ORDEN CORRECTO -->
+    <script src="js/header-responsive.js"></script>
     <script src="js/config.js"></script>
-    <script src="js/main.js"></script>
     <script src="js/footer.js"></script>
+    <script src="js/elegant-interactions.js"></script>
+    <script src="js/main.js"></script>
+    
     <script>
-        // Cargar productos al iniciar
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inicializar configuración del sitio
-            initializeSiteElements();
+        // INICIALIZACIÓN PRINCIPAL CON DEBUG
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🎨 Iniciando Origen Puro Coffee...');
             
-            // Cargar productos (estas funciones deben estar en main.js)
-            if (typeof cargarProductosTop === 'function') {
-                cargarProductosTop();
-            }
-            if (typeof cargarTodosProductos === 'function') {
-                cargarTodosProductos();
-            }
-            
-            // Actualizar contador del carrito después de que esté disponible
-            if (typeof carrito !== 'undefined') {
-                carrito.actualizarContador();
-                updateCartCounter();
+            try {
+                // 1. Inicializar elementos del sitio si existe la función
+                if (typeof initializeSiteElements === 'function') {
+                    console.log('🔧 Inicializando elementos del sitio...');
+                    initializeSiteElements();
+                } else {
+                    console.warn('⚠️ initializeSiteElements no disponible');
+                }
+                
+                // 2. Actualizar contador del carrito
+                if (typeof carrito !== 'undefined' && carrito.actualizarContador) {
+                    console.log('🛒 Actualizando contador del carrito...');
+                    carrito.actualizarContador();
+                } else {
+                    console.warn('⚠️ carrito no disponible');
+                }
+                
+                if (typeof updateCartCounter === 'function') {
+                    updateCartCounter();
+                }
+                
+                // 3. Cargar productos TOP con manejo de errores
+                console.log('📦 Cargando productos destacados...');
+                if (typeof cargarProductosTop === 'function') {
+                    await cargarProductosTop();
+                } else {
+                    console.error('❌ cargarProductosTop no está disponible');
+                    document.getElementById('productos-top').innerHTML = 
+                        '<p style="text-align: center; color: #d32f2f;">Error: No se pueden cargar productos destacados</p>';
+                }
+                
+                // 4. Cargar todos los productos con manejo de errores
+                console.log('📦 Cargando todos los productos...');
+                if (typeof cargarTodosProductos === 'function') {
+                    await cargarTodosProductos();
+                } else {
+                    console.error('❌ cargarTodosProductos no está disponible');
+                    document.getElementById('productos-todos').innerHTML = 
+                        '<p style="text-align: center; color: #d32f2f;">Error: No se pueden cargar productos</p>';
+                }
+                
+                console.log('✅ Origen Puro Coffee cargado completamente');
+                
+            } catch (error) {
+                console.error('❌ Error durante la inicialización:', error);
+                
+                // Mostrar mensaje de error en productos si falla todo
+                const errorMsg = '<div style="text-align: center; padding: 2rem; color: #d32f2f; background: #ffebee; border-radius: 8px; margin: 1rem 0;"><strong>Error de conexión</strong><br>No se pueden cargar los productos en este momento.<br><small>Verifica tu conexión e intenta recargar la página.</small></div>';
+                
+                const topContainer = document.getElementById('productos-top');
+                const todosContainer = document.getElementById('productos-todos');
+                
+                if (topContainer) topContainer.innerHTML = errorMsg;
+                if (todosContainer) todosContainer.innerHTML = errorMsg;
             }
         });
     </script>

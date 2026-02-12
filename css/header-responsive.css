@@ -1,0 +1,17 @@
+/* header-responsive.css
+   Archivo CSS liviano para ayudar con el comportamiento del header.
+   Nota: el JS del header se encuentra en js/header-responsive.js; este archivo sustituye contenido accidentalmente colocado.
+*/
+
+/* Por defecto ocultamos cualquier botón "menu-toggle" (se muestra en móvil vía styles-elegant.css) */
+.menu-toggle { display: none; }
+
+/* Mobile: mostrar el toggle en pantallas pequeñas */
+@media (max-width: 767px) {
+    .menu-toggle { display: inline-flex !important; }
+}
+
+/* Forzar nav a estar estático en pantallas amplias */
+@media (min-width: 768px) {
+    .nav { position: static !important; transform: none !important; opacity: 1 !important; visibility: visible !important; }
+}

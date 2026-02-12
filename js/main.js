@@ -1,190 +1,277 @@
 // ========================================
-// CONFIGURACIÓN
+// MAIN.JS - FUNCIONES PRINCIPALES SIN DUPLICACIONES
 // ========================================
 
-const API_URL = 'http://localhost:8080/api';
-const COSTO_ENVIO = 4.95;
+console.log('🚀 Main.js cargado - Versión limpia');
 
 // ========================================
-// CLASE CARRITO
+// INICIALIZACIÓN PRINCIPAL DE PÁGINAS
 // ========================================
 
-class Carrito {
-    constructor() {
-        this.items = JSON.parse(localStorage.getItem('carrito')) || [];
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📄 DOM cargado en main.js');
+    
+    // Detectar página actual
+    const currentPage = window.location.pathname.split('/').pop();
+    console.log('📍 Página actual:', currentPage);
+    
+    // Inicializar según la página
+    switch(currentPage) {
+        case 'index.html':
+        case '':
+            console.log('🏠 Inicializando página principal');
+            initHomePage();
+            break;
+            
+        case 'producto.html':
+            console.log('☕ Inicializando página de producto');
+            initProductPage();
+            break;
+            
+        case 'carrito.html':
+            console.log('Inicializando página de carrito');
+            initCartPage();
+            break;
+            
+        case 'mis-compras.html':
+            console.log('📦 Inicializando página de compras');
+            initOrdersPage();
+            break;
+            
+        default:
+            console.log('📄 Página genérica, inicialización básica');
+            initBasicPage();
     }
+    
+    // Funciones comunes para todas las páginas
+    initCommonFeatures();
+});
 
-    agregar(producto, cantidad = 1) {
-        const existe = this.items.find(item => item.id === producto.id);
+// ========================================
+// FUNCIONES DE INICIALIZACIÓN POR PÁGINA
+// ========================================
+
+function initHomePage() {
+    console.log('🏠 Configurando página principal...');
+    
+    // Verificar si las funciones de config.js están disponibles
+    if (typeof cargarProductosTop === 'function') {
+        setTimeout(() => {
+            cargarProductosTop();
+            console.log('📦 Productos TOP solicitados');
+        }, 500);
+    }
+    
+    if (typeof cargarTodosProductos === 'function') {
+        setTimeout(() => {
+            cargarTodosProductos();
+            console.log('📦 Todos los productos solicitados');
+        }, 1000);
+    }
+}
+
+function initProductPage() {
+    console.log('☕ Configurando página de producto...');
+    
+    // Obtener ID del producto de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+    
+    if (productId) {
+        console.log('🔍 ID de producto encontrado:', productId);
         
-        if (existe) {
-            existe.cantidad += cantidad;
+        // Verificar si la función de config.js está disponible
+        if (typeof cargarProducto === 'function') {
+            cargarProducto(productId);
         } else {
-            this.items.push({ 
-                ...producto, 
-                cantidad: cantidad 
-            });
+            console.warn('⚠️ Función cargarProducto no disponible');
         }
-        
-        this.guardar();
-        this.actualizarContador();
-    }
-
-    eliminar(productoId) {
-        this.items = this.items.filter(item => item.id !== productoId);
-        this.guardar();
-        this.actualizarContador();
-    }
-
-    actualizarCantidad(productoId, cantidad) {
-        const item = this.items.find(item => item.id === productoId);
-        if (item) {
-            item.cantidad = parseInt(cantidad);
-            if (item.cantidad <= 0) {
-                this.eliminar(productoId);
-            } else {
-                this.guardar();
-            }
-        }
-    }
-
-    obtenerSubtotal() {
-        return this.items.reduce((total, item) => {
-            const precio = this.calcularPrecioFinal(item.price, item.discount);
-            return total + (precio * item.cantidad);
-        }, 0);
-    }
-
-    obtenerTotal() {
-        return this.obtenerSubtotal() + COSTO_ENVIO;
-    }
-
-    calcularPrecioFinal(precio, descuento) {
-        return precio * (1 - descuento);
-    }
-
-    vaciar() {
-        this.items = [];
-        this.guardar();
-        this.actualizarContador();
-    }
-
-    guardar() {
-        localStorage.setItem('carrito', JSON.stringify(this.items));
-    }
-
-    actualizarContador() {
-        const contador = document.getElementById('cart-count');
-        if (contador) {
-            const total = this.items.reduce((sum, item) => sum + item.cantidad, 0);
-            contador.textContent = total;
-        }
+    } else {
+        console.error('❌ No se encontró ID de producto en la URL');
+        // Redirigir a la página principal si no hay ID
+        window.location.href = 'index.html';
     }
 }
 
-// Instancia global del carrito
-const carrito = new Carrito();
+function initCartPage() {
+    console.log('Configurando página de carrito...');
+    
+    // La página de carrito maneja su propia inicialización
+    // Solo verificamos que las funciones estén disponibles
+    if (typeof mostrarCarrito === 'function') {
+        console.log('✅ Función mostrarCarrito disponible');
+    } else {
+        console.warn('⚠️ Función mostrarCarrito no disponible');
+    }
+}
+
+function initOrdersPage() {
+    console.log('📦 Configurando página de pedidos...');
+    
+    // Verificar si la función de config.js está disponible
+    if (typeof mostrarPedidos === 'function') {
+        mostrarPedidos();
+        console.log('📋 Pedidos solicitados');
+    } else {
+        console.warn('⚠️ Función mostrarPedidos no disponible');
+    }
+}
+
+function initBasicPage() {
+    console.log('📄 Inicialización básica para página genérica');
+    
+    // Solo inicialización común
+    // Las páginas específicas manejan su propia lógica
+}
 
 // ========================================
-// FUNCIONES PARA PÁGINA PRINCIPAL
+// FUNCIONES COMUNES PARA TODAS LAS PÁGINAS
 // ========================================
 
-async function cargarProductosTop() {
-    try {
-        const response = await fetch(`${API_URL}/products/top`);
-        const productos = await response.json();
-        
-        mostrarProductos(productos, 'productos-top');
-    } catch (error) {
-        console.error('Error cargando productos destacados:', error);
+function initCommonFeatures() {
+    console.log('🔧 Inicializando funciones comunes...');
+    
+    // Actualizar contador del carrito si está disponible
+    if (typeof carrito !== 'undefined' && carrito.actualizarContador) {
+        carrito.actualizarContador();
+        console.log('Contador de carrito actualizado');
     }
+    
+    if (typeof updateCartCounter === 'function') {
+        updateCartCounter();
+    }
+    
+    // Inicializar elementos del sitio (footer, etc.)
+    if (typeof initializeSiteElements === 'function') {
+        initializeSiteElements();
+        console.log('🏗️ Elementos del sitio inicializados');
+    }
+    
+    // Configurar enlaces activos del menú
+    setActiveMenuLink();
+    
+    console.log('✅ Funciones comunes inicializadas');
 }
 
-async function cargarTodosProductos() {
-    try {
-        const response = await fetch(`${API_URL}/products`);
-        const productos = await response.json();
-        
-        mostrarProductos(productos, 'productos-todos');
-    } catch (error) {
-        console.error('Error cargando productos:', error);
-    }
-}
+// ========================================
+// UTILIDADES GENERALES
+// ========================================
 
-function mostrarProductos(productos, contenedorId) {
-    const container = document.getElementById(contenedorId);
-    if (!container) return;
+function setActiveMenuLink() {
+    const currentPage = window.location.pathname.split('/').pop();
+    const navLinks = document.querySelectorAll('.nav a');
     
-    container.innerHTML = '';
-    
-    productos.forEach(producto => {
-        const precioOriginal = producto.price;
-        const precioFinal = precioOriginal * (1 - producto.discount);
-        const tieneDescuento = producto.discount > 0;
+    navLinks.forEach(link => {
+        link.classList.remove('active');
         
-        const imagenUrl = producto.main_image || 'https://via.placeholder.com/300x250?text=Café';
+        // Obtener el href del enlace
+        const linkPage = link.getAttribute('href');
         
-        const card = document.createElement('div');
-        card.className = 'producto-card';
-        card.innerHTML = `
-            <img src="${imagenUrl}" alt="${producto.name}" onerror="this.src='https://via.placeholder.com/300x250?text=Café'">
-            <div class="producto-card-content">
-                <h3>${producto.name}</h3>
-                <p class="producto-origen">${obtenerOrigen(producto.name)}</p>
-                <p>${producto.description}</p>
-                
-                <div class="producto-precio-container">
-                    ${tieneDescuento ? `<span class="producto-precio-original">€${precioOriginal.toFixed(2)}</span>` : ''}
-                    <span class="producto-precio">€${precioFinal.toFixed(2)}</span>
-                    ${tieneDescuento ? `<span class="producto-descuento">-${(producto.discount * 100).toFixed(0)}%</span>` : ''}
-                </div>
-                
-                <a href="producto.html?id=${producto.id}" class="btn btn-primary">Ver producto</a>
-            </div>
-        `;
-        
-        container.appendChild(card);
+        // Marcar como activo si coincide con la página actual
+        if (linkPage === currentPage || 
+            (currentPage === '' && linkPage === 'index.html') ||
+            (currentPage === 'index.html' && linkPage === 'index.html')) {
+            link.classList.add('active');
+            console.log('🔗 Enlace activo marcado:', linkPage);
+        }
     });
 }
 
-function obtenerOrigen(nombre) {
-    // Verificar que nombre existe
-    if (!nombre) return 'Origen selecto';
+// ========================================
+// FUNCIONES GLOBALES ADICIONALES
+// ========================================
+
+// Función global para agregar productos al carrito desde cualquier página
+function agregarAlCarritoGlobal(producto, cantidad = 1) {
+    console.log('Agregando al carrito desde main.js:', producto.name);
     
-    // Mapeo de productos a orígenes de café
-    const origenes = {
-        'Colombia': 'Colombia',
-        'Etiopía': 'Etiopía',
-        'Etiopia': 'Etiopía',
-        'Brasil': 'Brasil',
-        'Kenya': 'Kenya',
-        'Guatemala': 'Guatemala',
-        'Costa Rica': 'Costa Rica',
-        'Sumatra': 'Indonesia',
-        'Java': 'Indonesia'
-    };
+    if (typeof carrito !== 'undefined' && carrito.agregar) {
+        carrito.agregar(producto, cantidad);
+        
+        // Mostrar mensaje de confirmación
+        mostrarNotificacion('✅ Producto agregado al carrito', 'success');
+        
+        return true;
+    } else {
+        console.error('❌ Carrito no disponible');
+        mostrarNotificacion('❌ Error agregando producto', 'error');
+        return false;
+    }
+}
+
+// Función para mostrar notificaciones temporales
+function mostrarNotificacion(mensaje, tipo = 'info') {
+    const notificacion = document.createElement('div');
+    notificacion.className = `notificacion notificacion-${tipo}`;
+    notificacion.textContent = mensaje;
     
-    for (let clave in origenes) {
-        if (nombre.includes(clave)) {
-            return origenes[clave];
-        }
+    // Estilos básicos para la notificación
+    notificacion.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        z-index: 9999;
+        animation: slideInRight 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    `;
+    
+    // Colores según el tipo
+    switch(tipo) {
+        case 'success':
+            notificacion.style.background = '#d4edda';
+            notificacion.style.color = '#155724';
+            notificacion.style.border = '1px solid #c3e6cb';
+            break;
+        case 'error':
+            notificacion.style.background = '#f8d7da';
+            notificacion.style.color = '#721c24';
+            notificacion.style.border = '1px solid #f5c6cb';
+            break;
+        default:
+            notificacion.style.background = '#d1ecf1';
+            notificacion.style.color = '#0c5460';
+            notificacion.style.border = '1px solid #bee5eb';
     }
     
-    return 'Origen selecto';
+    document.body.appendChild(notificacion);
+    
+    // Remover después de 3 segundos
+    setTimeout(() => {
+        if (notificacion.parentNode) {
+            notificacion.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => {
+                notificacion.parentNode.removeChild(notificacion);
+            }, 300);
+        }
+    }, 3000);
+}
+
+// Función para formatear precios
+function formatearPrecio(precio) {
+    return `€${precio.toFixed(2)}`;
+}
+
+// Función para obtener parámetros de URL
+function obtenerParametroURL(nombre) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(nombre);
 }
 
 // ========================================
-// FUNCIONES PARA PÁGINA DE PRODUCTO
+// FUNCIONES PARA PÁGINA DE PRODUCTO (MIGRADA A PHP)
 // ========================================
 
 async function cargarProducto(id) {
     try {
-        console.log('Intentando cargar producto ID:', id);
-        console.log('URL de la API:', `${API_URL}/products/${id}`);
+        console.log('📦 Cargando producto desde PHP, ID:', id);
+        console.log('🌐 URL PHP:', `${API_PHP}?id=${id}`);
         
-        const response = await fetch(`${API_URL}/products/${id}`);
+        const response = await fetch(`${API_PHP}?id=${id}`);
         
-        console.log('Respuesta de la API:', response.status, response.statusText);
+        console.log('📡 Respuesta PHP:', response.status, response.statusText);
         
         if (!response.ok) {
             throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
@@ -192,11 +279,11 @@ async function cargarProducto(id) {
         
         let producto = await response.json();
         
-        console.log('Datos recibidos:', producto);
+        console.log('📄 Datos recibidos desde PHP:', producto);
         
         // FIX: Si la API devuelve un array, tomar el primer elemento
         if (Array.isArray(producto)) {
-            console.log('API devolvió array, tomando primer elemento');
+            console.log('📋 API devolvió array, tomando primer elemento');
             producto = producto[0];
         }
         
@@ -209,25 +296,61 @@ async function cargarProducto(id) {
         // Guardar producto en variable global para agregar al carrito
         window.productoActual = producto;
         
-        console.log('Producto cargado exitosamente');
+        console.log('✅ Producto cargado exitosamente desde PHP');
         
     } catch (error) {
-        console.error('❌ ERROR COMPLETO:', error);
-        console.error('Detalles del error:', error.message);
+        console.error('❌ ERROR cargando producto desde PHP:', error);
+        console.error('🔍 Detalles del error:', error.message);
         
-        // Mostrar error en la página en lugar de redirigir
-        const nombreElement = document.getElementById('producto-nombre');
-        const descripcionElement = document.querySelector('.producto-info .producto-descripcion p');
-        
-        if (nombreElement) {
-            nombreElement.textContent = 'Error cargando producto';
-        }
-        
-        if (descripcionElement) {
-            descripcionElement.innerHTML = `
-                <strong>Error:</strong> ${error.message}<br><br>
-                <a href="index.html" class="btn btn-primary">Volver a la tienda</a>
-            `;
+        // Fallback a API original
+        try {
+            console.log('🔄 Intentando con API Node.js...');
+            console.log('🌐 URL Node.js:', `${API_URL}/products/${id}`);
+            
+            const response = await fetch(`${API_URL}/products/${id}`);
+            
+            console.log('📡 Respuesta Node.js:', response.status, response.statusText);
+            
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
+            }
+            
+            let producto = await response.json();
+            
+            console.log('📄 Datos recibidos desde Node.js:', producto);
+            
+            // FIX: Si la API devuelve un array, tomar el primer elemento
+            if (Array.isArray(producto)) {
+                console.log('📋 API devolvió array, tomando primer elemento');
+                producto = producto[0];
+            }
+            
+            if (!producto || !producto.id) {
+                throw new Error('Producto inválido o vacío');
+            }
+            
+            mostrarDetalleProducto(producto);
+            window.productoActual = producto;
+            
+            console.log('✅ Producto cargado exitosamente desde Node.js (fallback)');
+            
+        } catch (fallbackError) {
+            console.error('❌ Fallback también falló:', fallbackError);
+            
+            // Mostrar error en la página en lugar de redirigir
+            const nombreElement = document.getElementById('producto-nombre');
+            const descripcionElement = document.querySelector('.producto-info .producto-descripcion p');
+            
+            if (nombreElement) {
+                nombreElement.textContent = 'Error cargando producto';
+            }
+            
+            if (descripcionElement) {
+                descripcionElement.innerHTML = `
+                    <strong>Error:</strong> ${fallbackError.message}<br><br>
+                    <a href="index.html" class="btn btn-primary">Volver a la tienda</a>
+                `;
+            }
         }
     }
 }
@@ -269,455 +392,46 @@ function mostrarDetalleProducto(producto) {
     }
 }
 
-function agregarAlCarrito() {
-    const cantidad = parseInt(document.getElementById('cantidad').value);
-    
-    if (window.productoActual) {
-        carrito.agregar(window.productoActual, cantidad);
-        
-        // Mostrar mensaje de confirmación
-        const mensaje = document.getElementById('mensaje-agregado');
-        mensaje.style.display = 'block';
-        
-        setTimeout(() => {
-            mensaje.style.display = 'none';
-        }, 3000);
-        
-        // Resetear cantidad
-        document.getElementById('cantidad').value = 1;
-    }
-}
-
 // ========================================
-// FUNCIONES PARA PÁGINA DE CARRITO
+// HACER FUNCIONES DISPONIBLES GLOBALMENTE
 // ========================================
 
-function mostrarCarrito() {
-    const carritoVacio = document.getElementById('carrito-vacio');
-    const carritoContenido = document.getElementById('carrito-contenido');
-    const listaProductos = document.getElementById('lista-productos');
-    
-    if (carrito.items.length === 0) {
-        carritoVacio.style.display = 'block';
-        carritoContenido.style.display = 'none';
-        return;
-    }
-    
-    carritoVacio.style.display = 'none';
-    carritoContenido.style.display = 'grid';
-    
-    listaProductos.innerHTML = '';
-    
-    carrito.items.forEach(item => {
-        const precioFinal = carrito.calcularPrecioFinal(item.price, item.discount);
-        const subtotal = precioFinal * item.cantidad;
-        const imagenUrl = item.main_image || 'https://via.placeholder.com/100x100?text=Café';
-        
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'carrito-item';
-        itemDiv.innerHTML = `
-            <img src="${imagenUrl}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/100x100?text=Café'">
-            
-            <div class="carrito-item-info">
-                <h3>${item.name}</h3>
-                <p>${obtenerOrigen(item.name)}</p>
-                
-                <div class="carrito-item-cantidad">
-                    <label>Cantidad:</label>
-                    <input type="number" value="${item.cantidad}" min="1" max="10" 
-                           onchange="actualizarCantidadCarrito(${item.id}, this.value)"
-                           style="width: 60px; padding: 0.25rem; text-align: center;">
-                    <button class="btn-eliminar" onclick="eliminarDelCarrito(${item.id})">
-                        Eliminar
-                    </button>
-                </div>
-            </div>
-            
-            <div class="carrito-item-precio">
-                <span class="precio-unitario">€${precioFinal.toFixed(2)} c/u</span>
-                <span class="precio-total">€${subtotal.toFixed(2)}</span>
-            </div>
-        `;
-        
-        listaProductos.appendChild(itemDiv);
-    });
-    
-    actualizarTotalesCarrito();
-}
+window.agregarAlCarritoGlobal = agregarAlCarritoGlobal;
+window.mostrarNotificacion = mostrarNotificacion;
+window.formatearPrecio = formatearPrecio;
+window.obtenerParametroURL = obtenerParametroURL;
 
-function actualizarCantidadCarrito(productoId, cantidad) {
-    carrito.actualizarCantidad(productoId, cantidad);
-    mostrarCarrito();
-}
+console.log('✅ Main.js completamente cargado - Sin duplicaciones');
+console.log('🌐 Funciones globales de main.js:', {
+    agregarAlCarritoGlobal: typeof window.agregarAlCarritoGlobal,
+    mostrarNotificacion: typeof window.mostrarNotificacion,
+    formatearPrecio: typeof window.formatearPrecio,
+    obtenerParametroURL: typeof window.obtenerParametroURL
+});
 
-function eliminarDelCarrito(productoId) {
-    if (confirm('¿Eliminar este producto del carrito?')) {
-        carrito.eliminar(productoId);
-        mostrarCarrito();
-    }
-}
-
-function actualizarTotalesCarrito() {
-    const subtotal = carrito.obtenerSubtotal();
-    const total = carrito.obtenerTotal();
-    
-    document.getElementById('subtotal').textContent = `€${subtotal.toFixed(2)}`;
-    document.getElementById('envio').textContent = `€${COSTO_ENVIO.toFixed(2)}`;
-    document.getElementById('total').textContent = `€${total.toFixed(2)}`;
-}
-
-// ========================================
-// FUNCIONES PARA CHECKOUT
-// ========================================
-
-function mostrarResumenCheckout() {
-    const resumenProductos = document.getElementById('resumen-productos');
-    
-    resumenProductos.innerHTML = '';
-    
-    carrito.items.forEach(item => {
-        const precioFinal = carrito.calcularPrecioFinal(item.price, item.discount);
-        const subtotal = precioFinal * item.cantidad;
-        
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'resumen-item';
-        itemDiv.innerHTML = `
-            <div class="resumen-item-info">
-                <h4>${item.name}</h4>
-                <p>Cantidad: ${item.cantidad} × €${precioFinal.toFixed(2)}</p>
-            </div>
-            <div class="resumen-item-precio">
-                €${subtotal.toFixed(2)}
-            </div>
-        `;
-        
-        resumenProductos.appendChild(itemDiv);
-    });
-    
-    const subtotal = carrito.obtenerSubtotal();
-    const total = carrito.obtenerTotal();
-    
-    document.getElementById('checkout-subtotal').textContent = `€${subtotal.toFixed(2)}`;
-    document.getElementById('checkout-envio').textContent = `€${COSTO_ENVIO.toFixed(2)}`;
-    document.getElementById('checkout-total').textContent = `€${total.toFixed(2)}`;
-}
-
-// ========================================
-// INTEGRACIÓN CON PAYPAL
-// ========================================
-
-function inicializarPayPal() {
-    // Verifica si PayPal SDK está cargado
-    if (typeof paypal === 'undefined') {
-        console.error('PayPal SDK no está cargado');
-        document.getElementById('paypal-button-container').innerHTML = 
-            '<p style="color: red; padding: 1rem; background: #fee; border-radius: 4px;">⚠️ Error: Configura tu Client ID de PayPal en checkout.html línea 65</p>';
-        return;
-    }
-    
-    paypal.Buttons({
-        // Estilo de los botones
-        style: {
-            layout: 'vertical',
-            color: 'gold',
-            shape: 'rect',
-            label: 'paypal'
-        },
-        
-        // Crear la orden
-        createOrder: function(data, actions) {
-            const total = carrito.obtenerTotal();
-            
-            console.log('Creando orden PayPal por:', total.toFixed(2), 'EUR');
-            
-            return actions.order.create({
-                purchase_units: [{
-                    amount: {
-                        value: total.toFixed(2),
-                        currency_code: 'EUR'
-                    },
-                    description: 'Compra en Origen Puro Coffee'
-                }]
-            });
-        },
-        
-        // Cuando el usuario aprueba el pago
-        onApprove: async function(data, actions) {
-            try {
-                // Capturar el pago
-                const detalles = await actions.order.capture();
-                console.log('✅ Pago completado:', detalles);
-                
-                // Crear pedido en la API con estado "paid"
-                const pedido = await crearPedidoEnAPI('paid', detalles.id);
-                console.log('✅ Pedido guardado en BD:', pedido);
-                
-                // Vaciar carrito
-                carrito.vaciar();
-                
-                // Mostrar modal de confirmación
-                const total = detalles.purchase_units[0].amount.value;
-                const transaccionId = detalles.id;
-                
-                mostrarModalConfirmacion({
-                    total: total,
-                    transaccionId: transaccionId,
-                    referenciaPedido: pedido.reference || 'N/A'
-                });
-                
-            } catch (error) {
-                console.error('❌ Error procesando el pago:', error);
-                alert(`❌ Error al procesar el pago\n\nHubo un problema al guardar tu pedido.\nPor favor, contacta con soporte.\n\nError: ${error.message}`);
-            }
-        },
-        
-        // Si hay error en PayPal
-        onError: function(err) {
-            console.error('❌ Error en PayPal:', err);
-            alert('Error al procesar el pago con PayPal. Por favor, inténtalo de nuevo.');
-        },
-        
-        // Si el usuario cancela
-        onCancel: function(data) {
-            console.log('⚠️ Usuario canceló el pago');
-            alert('Pago cancelado. Puedes volver a intentarlo cuando quieras.');
+// Agregar estilos CSS para las animaciones de notificación
+const styles = document.createElement('style');
+styles.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
         }
-        
-    }).render('#paypal-button-container');
-    
-    console.log('✅ Botones de PayPal inicializados');
-}
-
-// ========================================
-// API - CREAR PEDIDO
-// ========================================
-
-async function crearPedidoEnAPI(estado = 'created', referenciaExterna = '') {
-    try {
-        const nombreUsuario = document.getElementById('nombre')?.value || 'usuario_invitado';
-        const referencia = `REF_${Date.now()}`;
-        
-        const pedido = {
-            reference: referencia,
-            user: nombreUsuario,
-            total_amount: carrito.obtenerTotal(),
-            product_count: carrito.items.length,
-            status: estado
-        };
-        
-        const response = await fetch(`${API_URL}/orders`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(pedido)
-        });
-        
-        if (!response.ok) {
-            throw new Error('Error al crear el pedido');
+        to {
+            transform: translateX(0);
+            opacity: 1;
         }
-        
-        const resultado = await response.json();
-        console.log('Pedido creado:', resultado);
-        
-        // Guardar pedido en historial local
-        guardarPedidoEnHistorial({
-            ...pedido,
-            id: resultado.id || Date.now(),
-            productos: [...carrito.items],
-            fecha: new Date().toISOString(),
-            referencia_pago: referenciaExterna
-        });
-        
-        return resultado;
-        
-    } catch (error) {
-        console.error('Error creando pedido:', error);
-        throw error;
-    }
-}
-
-// ========================================
-// HISTORIAL DE PEDIDOS (LocalStorage)
-// ========================================
-
-function guardarPedidoEnHistorial(pedido) {
-    console.log('🔄 Guardando pedido en historial:', pedido);
-    
-    let historial = JSON.parse(localStorage.getItem('historial_pedidos')) || [];
-    console.log('📋 Historial ANTES:', historial.length, 'pedidos');
-    
-    historial.unshift(pedido); // Agregar al inicio
-    
-    // Limitar a últimos 20 pedidos
-    if (historial.length > 20) {
-        historial = historial.slice(0, 20);
     }
     
-    localStorage.setItem('historial_pedidos', JSON.stringify(historial));
-    console.log('✅ Historial DESPUÉS:', historial.length, 'pedidos');
-    console.log('💾 Guardado en LocalStorage correctamente');
-    
-    // Verificar que se guardó
-    const verificacion = JSON.parse(localStorage.getItem('historial_pedidos'));
-    console.log('🔍 Verificación - pedidos guardados:', verificacion.length);
-}
-
-function obtenerHistorialPedidos() {
-    return JSON.parse(localStorage.getItem('historial_pedidos')) || [];
-}
-
-// ========================================
-// MODAL DE CONFIRMACIÓN DE PAGO
-// ========================================
-
-function mostrarModalConfirmacion(datos) {
-    // Crear overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    
-    // Truncar ID de transacción para mostrar
-    const idCorto = datos.transaccionId.substring(0, 16) + '...';
-    
-    overlay.innerHTML = `
-        <div class="modal-container">
-            <div class="modal-header">
-                <div class="modal-icon">✓</div>
-                <h2>¡Pago Completado!</h2>
-                <p>Tu pedido ha sido procesado correctamente</p>
-            </div>
-            
-            <div class="modal-body">
-                <div class="modal-total">
-                    <span class="modal-total-label">Total Pagado</span>
-                    <span class="modal-total-value">€${datos.total}</span>
-                </div>
-                
-                <div class="modal-details">
-                    <div class="modal-detail-item">
-                        <span class="modal-detail-label">🔖 ID Transacción</span>
-                        <span class="modal-detail-value">${idCorto}</span>
-                    </div>
-                    <div class="modal-detail-item">
-                        <span class="modal-detail-label">📦 Referencia</span>
-                        <span class="modal-detail-value">${datos.referenciaPedido}</span>
-                    </div>
-                    <div class="modal-detail-item">
-                        <span class="modal-detail-label">📅 Fecha</span>
-                        <span class="modal-detail-value">${new Date().toLocaleString('es-ES')}</span>
-                    </div>
-                </div>
-                
-                <div class="modal-footer">
-                    <p class="modal-message">
-                        Gracias por tu compra en <strong>Origen Puro Coffee</strong> ☕<br>
-                        Serás redirigido a tus compras en unos segundos...
-                    </p>
-                    <button class="modal-button" onclick="irAMisCompras()">
-                        Ver Mis Compras
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(overlay);
-    
-    // Auto-redirigir después de 5 segundos
-    setTimeout(() => {
-        window.location.href = 'mis-compras.html';
-    }, 5000);
-}
-
-function irAMisCompras() {
-    window.location.href = 'mis-compras.html';
-}
-
-
-function mostrarPedidos() {
-    console.log('📦 Cargando página Mis Compras...');
-    
-    const historial = obtenerHistorialPedidos();
-    console.log('📋 Pedidos en historial:', historial.length);
-    console.log('📄 Datos completos:', historial);
-    
-    const sinPedidos = document.getElementById('sin-pedidos');
-    const listaPedidos = document.getElementById('lista-pedidos');
-    
-    if (!listaPedidos) {
-        console.error('❌ ERROR: Elemento "lista-pedidos" no encontrado en el DOM');
-        return;
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
     }
-    
-    if (historial.length === 0) {
-        console.log('⚠️ No hay pedidos para mostrar');
-        sinPedidos.style.display = 'block';
-        listaPedidos.style.display = 'none';
-        return;
-    }
-    
-    console.log('✅ Mostrando', historial.length, 'pedidos');
-    sinPedidos.style.display = 'none';
-    listaPedidos.style.display = 'block';
-    listaPedidos.innerHTML = '';
-    
-    historial.forEach((pedido, index) => {
-        console.log(`  Pedido ${index + 1}:`, pedido.reference);
-        
-        const fecha = new Date(pedido.fecha);
-        const fechaFormateada = fecha.toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-        
-        const estadoClase = pedido.status === 'paid' ? 'estado-pagado' : 
-                           pedido.status === 'canceled' ? 'estado-cancelado' : 
-                           'estado-creado';
-        
-        const estadoTexto = pedido.status === 'paid' ? 'Pagado' : 
-                           pedido.status === 'canceled' ? 'Cancelado' : 
-                           'Pendiente';
-        
-        const pedidoDiv = document.createElement('div');
-        pedidoDiv.className = 'pedido-card';
-        pedidoDiv.innerHTML = `
-            <div class="pedido-header">
-                <div>
-                    <h3>Pedido ${pedido.reference}</h3>
-                    <p class="pedido-fecha">${fechaFormateada}</p>
-                </div>
-                <span class="pedido-estado ${estadoClase}">${estadoTexto}</span>
-            </div>
-            
-            <div class="pedido-productos">
-                <div class="pedido-productos-titulo">Productos</div>
-                ${pedido.productos.map(item => {
-                    const precio = carrito.calcularPrecioFinal(item.price, item.discount);
-                    return `
-                        <div class="pedido-producto-item">
-                            <span class="pedido-producto-nombre">${item.cantidad}x ${item.name}</span>
-                            <span class="pedido-producto-precio">€${(precio * item.cantidad).toFixed(2)}</span>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
-            
-            <div class="pedido-footer">
-                <div class="pedido-total">
-                    <strong>Total:</strong>
-                    <strong>€${pedido.total_amount.toFixed(2)}</strong>
-                </div>
-                ${pedido.referencia_pago ? `
-                    <p class="pedido-referencia">ID: ${pedido.referencia_pago.substring(0, 16)}...</p>
-                ` : ''}
-            </div>
-        `;
-        
-        listaPedidos.appendChild(pedidoDiv);
-    });
-    
-    console.log('✅ Pedidos renderizados correctamente');
-}
+`;
+document.head.appendChild(styles);

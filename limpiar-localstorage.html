@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpiar LocalStorage - Origen Puro Coffee</title>
+</head>
+<body>
+    <h1>Limpiador de LocalStorage</h1>
+    <button onclick="limpiarTodo()">Limpiar TODO el localStorage</button>
+    <button onclick="limpiarCarrito()">Limpiar solo CARRITO</button>
+    <button onclick="limpiarHistorial()">Limpiar solo HISTORIAL DE PEDIDOS</button>
+    
+    <div id="resultado"></div>
+
+    <script>
+        function limpiarTodo() {
+            localStorage.clear();
+            document.getElementById('resultado').innerHTML = '<p style="color: green;">✅ TODO el localStorage limpiado</p>';
+            console.log('🧹 LocalStorage completamente limpiado');
+        }
+        
+        function limpiarCarrito() {
+            localStorage.removeItem('carrito');
+            document.getElementById('resultado').innerHTML = '<p style="color: blue;"><i class="ph ph-shopping-cart"></i> Carrito limpiado</p>';
+            console.log('Carrito limpiado');
+        }
+        
+        function limpiarHistorial() {
+            localStorage.removeItem('historial_pedidos');
+            document.getElementById('resultado').innerHTML = '<p style="color: orange;">📦 Historial de pedidos limpiado</p>';
+            console.log('📦 Historial limpiado');
+        }
+
+    // Mostrar contenido actual del localStorage
+    console.log('Contenido actual del localStorage:');
+    console.log('Carrito:', localStorage.getItem('carrito'));
+    console.log('Historial:', localStorage.getItem('historial_pedidos'));
+    </script>
+</body>
+</html>
